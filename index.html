@@ -39,29 +39,66 @@ body{ margin:0; background:#f8fafc; color:#111; font-family:system-ui,-apple-sys
 .ok input { background:#dcfce7 !important; border:2px solid #16a34a !important; color:#065f46 !important; font-weight:700; }
 .ko input { background:#fee2e2 !important; border:2px solid #ef4444 !important; color:#991b1b !important; font-weight:700; }
 .table-cell { min-width:80px; }
+.barred::after{
+  content:"";
+  position:absolute;
+  width:100%;
+  height:2px;
+  background:red;
+  top:50%;
+  left:0;
+  transform:rotate(-45deg);
+}
 </style>
 </head>
 <body>
 <div id="root"></div>
+
 <script type="text/babel" data-presets="env,react">
 const {useState,useEffect,useRef,useMemo}=React;
-const BRAND="#8374a7"; const range=(a,b)=>Array.from({length:b-a+1},(_,i)=>a+i);
+const BRAND="#8374a7"; 
+const range=(a,b)=>Array.from({length:b-a+1},(_,i)=>a+i);
+const shuffle=a=>a.sort(()=>Math.random()-0.5);
+const rand=(min,max)=>min+Math.floor(Math.random()*(max-min+1));
+const vibrate=(p=[60,40,120])=>{ try{ if(navigator.vibrate) navigator.vibrate(p);}catch(_){ }};
+
 function useAccessibility(){
-  const [font,setFont]=useState("Arial"); const [size,setSize]=useState(18);
-  const [yellow,setYellow]=useState(false); const [black,setBlack]=useState(false);
+  const [font,setFont]=useState("Arial"); 
+  const [size,setSize]=useState(18);
+  const [yellow,setYellow]=useState(false); 
+  const [black,setBlack]=useState(false);
   const [audio,setAudio]=useState(false);
-  useEffect(()=>{ const FAMILY=font==="Comic"?"'Comic Sans MS','Comic Sans',cursive":font==="Verdana"?"Verdana, Geneva, Tahoma, sans-serif":font==="OpenDyslexicLocal"?"OpenDyslexicLocal":"Arial, Helvetica, sans-serif"; document.body.style.fontFamily=FAMILY; document.body.style.fontSize=`${size}px`; },[font,size]);
-  const rootBg=black?"#000":yellow?"#fff7cc":"#f8fafc"; const rootText=black?"#f8fafc":"#111"; const cardStyle={backgroundColor:yellow?"#fff7cc":black?"#111":"#fff",color:rootText};
-  const speak=txt=>{ try{ if(!audio) return; const u=new SpeechSynthesisUtterance(txt); u.lang="fr-FR"; speechSynthesis.cancel(); speechSynthesis.speak(u);}catch(e){} };
-  return{font,setFont,size,setSize,yellow,black,audio,setAudio,setYellow:setYellow,setBlack:setBlack,rootBg,rootText,cardStyle,speak};
+  useEffect(()=>{
+    const FAMILY=
+      font==="Comic"?"'Comic Sans MS','Comic Sans',cursive":
+      font==="Verdana"?"Verdana, Geneva, Tahoma, sans-serif":
+      font==="OpenDyslexicLocal"?"OpenDyslexicLocal":
+      "Arial, Helvetica, sans-serif";
+    document.body.style.fontFamily=FAMILY;
+    document.body.style.fontSize=`${size}px`;
+  },[font,size]);
+  const rootBg=black?"#000":yellow?"#fff7cc":"#f8fafc"; 
+  const rootText=black?"#f8fafc":"#111"; 
+  const cardStyle={backgroundColor:yellow?"#fff7cc":black?"#111":"#fff",color:rootText};
+  const speak=txt=>{
+    try{ if(!audio) return;
+      const u=new SpeechSynthesisUtterance(txt);
+      u.lang="fr-FR"; speechSynthesis.cancel(); speechSynthesis.speak(u);
+    }catch(e){}
+  };
+  return{font,setFont,size,setSize,yellow,black,audio,setAudio,setYellow,setBlack,rootBg,rootText,cardStyle,speak};
 }
+
 function AccessibilityCard({acc}){
   const light=acc.black?{background:'#f8fafc',color:'#111',borderColor:'#cbd5e1'}:{};
   return(<div className="card rounded-2xl p-4" style={acc.cardStyle}>
     <div className="font-bold mb-2">Accessibilité</div>
     <div className="flex gap-2 flex-wrap mb-2">
       <select value={acc.font} onChange={e=>acc.setFont(e.target.value)} className="border rounded p-1" style={light}>
-        <option value="Arial">Arial</option><option value="Verdana">Verdana</option><option value="Comic">Comic Sans</option><option value="OpenDyslexicLocal">OpenDyslexic</option>
+        <option value="Arial">Arial</option>
+        <option value="Verdana">Verdana</option>
+        <option value="Comic">Comic Sans</option>
+        <option value="OpenDyslexicLocal">OpenDyslexic</option>
       </select>
       <select value={acc.size} onChange={e=>acc.setSize(parseInt(e.target.value))} className="border rounded p-1" style={light}>
         {[16,18,20,22,24,26,28,30,32].map(s=><option key={s} value={s}>{s}px</option>)}
@@ -72,14 +109,18 @@ function AccessibilityCard({acc}){
     <label className="block"><input type="checkbox" checked={acc.audio} onChange={e=>acc.setAudio(e.target.checked)}/> Audio</label>
   </div>);
 }
+
 function TopNav({route,go}){
   return (<div className="mb-6 rounded-3xl overflow-hidden shadow-sm border card">
     <div className="px-4 py-3 text-white flex items-center justify-between" style={{backgroundColor:BRAND}}>
       <div className="flex items-center gap-3">
         <img src="dogbot.png" className="h-8 w-8 rounded-lg bg-white/90 p-1" alt="Dogbot"/>
-        <div><div className="font-black leading-tight">Sacado Académie</div><div className="text-xs opacity-90">Ateliers d’additions & soustractions</div></div>
+        <div>
+          <div className="font-black leading-tight">Sacado Académie</div>
+          <div className="text-xs opacity-90">Ateliers d’additions & soustractions</div>
+        </div>
       </div>
-      <img src="sacado.png" className="h-8 w-auto rounded bg-white/90 p-0.5" alt="Sacado"/>
+      <img src="sacadoLogo.png" className="h-8 w-auto rounded bg-white/90 p-0.5" alt="Sacado"/>
     </div>
     <div className="px-4 py-3 flex flex-wrap gap-2 bg-white/60">
       {[{k:"/",label:"Accueil"},{k:"/add",label:"Jeu — Additions"},{k:"/sub",label:"Jeu — Soustractions"},{k:"/pytha",label:"Jeu — Pythagore (additions)"}].map(tab=>(
@@ -88,249 +129,442 @@ function TopNav({route,go}){
     </div>
   </div>);
 }
-function Progress({remaining,total}){ if(total==null) return null; const pct=Math.max(0,Math.min(100,(remaining/total)*100)); return <div className="progress-wrap mt-2"><div className="progress-bar" style={{width:`${pct}%`}}></div></div>; }
-const vibrate=(p=[60,40,120])=>{ try{ if(navigator.vibrate) navigator.vibrate(p);}catch(_){}};
-const shuffle=a=>a.sort(()=>Math.random()-0.5); const rand=(min,max)=>min+Math.floor(Math.random()*(max-min+1));
+function Progress({remaining,total}){
+  if(total==null) return null;
+  const pct=Math.max(0,Math.min(100,(remaining/total)*100));
+  return <div className="progress-wrap mt-2"><div className="progress-bar" style={{width:`${pct}%`}}></div></div>;
+}
+
 function Recap({answers,onReplay,cardStyle}){
   const total=answers.length, ok=answers.filter(a=>a.correct).length;
   return (<div className="card rounded-2xl p-6" style={cardStyle}>
     <h2 className="text-2xl font-bold mb-2">Résultats 🎯</h2>
     <p className="mb-4">Tu as réussi <strong>{ok}/{total}</strong> questions.</p>
-    <div className="overflow-auto"><table className="w-full border-collapse min-w-[800px]"><thead><tr className="hdr">
-      <th className="border px-3 py-2 text-left">#</th><th className="border px-3 py-2 text-left">Question</th><th className="border px-3 py-2 text-left">Bonne réponse</th><th className="border px-3 py-2 text-left">Ta réponse</th><th className="border px-3 py-2 text-left">Statut</th><th className="border px-3 py-2 text-left">Remarque</th>
-    </tr></thead><tbody>
-    {answers.map((a,i)=>{ const rowCls=a.correct?"ok":"ko"; const extra=a.timeout?"⏳ Temps dépassé":(a.user==null?"Aucune réponse":""); return(
-      <tr key={i} className={rowCls}><td className="border px-3 py-2">{i+1}</td><td className="border px-3 py-2">{a.q}</td><td className="border px-3 py-2">{a.good}</td><td className="border px-3 py-2">{a.user==null?"—":String(a.user)}</td><td className="border px-3 py-2">{a.correct?"✅ Correct":"❌ Incorrect"}</td><td className="border px-3 py-2 text-slate-600">{extra}</td></tr>
-    );})}
-    </tbody></table></div>
-    <div className="flex gap-2 justify-center mt-6"><button onClick={onReplay} className="px-5 py-3 rounded-2xl text-white font-semibold shadow" style={{backgroundColor:BRAND}}>Rejouer</button><a href="#/" className="px-5 py-3 rounded-2xl border">Retour au menu</a></div>
+    <div className="overflow-auto">
+      <table className="w-full border-collapse min-w-[800px]">
+        <thead><tr className="hdr">
+          <th className="border px-3 py-2 text-left">#</th>
+          <th className="border px-3 py-2 text-left">Question</th>
+          <th className="border px-3 py-2 text-left">Bonne réponse</th>
+          <th className="border px-3 py-2 text-left">Ta réponse</th>
+          <th className="border px-3 py-2 text-left">Statut</th>
+        </tr></thead>
+        <tbody>
+        {answers.map((a,i)=>(
+          <tr key={i} className={a.correct?"ok":"ko"}>
+            <td className="border px-3 py-2">{i+1}</td>
+            <td className="border px-3 py-2">{a.q}</td>
+            <td className="border px-3 py-2">{a.good}</td>
+            <td className="border px-3 py-2">{a.user==null?"—":String(a.user)}</td>
+            <td className="border px-3 py-2">{a.correct?"✅ Correct":"❌ Incorrect"}</td>
+          </tr>
+        ))}
+        </tbody>
+      </table>
+    </div>
+    <div className="flex gap-2 justify-center mt-6">
+      <button onClick={onReplay} className="px-5 py-3 rounded-2xl text-white font-semibold shadow" style={{backgroundColor:BRAND}}>Rejouer</button>
+      <a href="#/" className="px-5 py-3 rounded-2xl border">Retour au menu</a>
+    </div>
   </div>);
 }
+
+/* ------------------------ ADDITIONS ----------------------- */
 function GameAdd({acc}){
   const {rootBg,rootText,cardStyle}=acc;
-  const [mode,setMode]=useState("decouverte"); const [questionCount,setQuestionCount]=useState(10); const [timeLimit,setTimeLimit]=useState(5);
-  const [started,setStarted]=useState(false), [finished,setFinished]=useState(false);
-  const [answers,setAnswers]=useState([]); const [tick,setTick]=useState(0);
-  const [idx,setIdx]=useState(0); const [items,setItems]=useState([]);
-  const [a,setA]=useState(""),[b,setB]=useState(""),[r,setR]=useState(""); const [one,setOne]=useState("");
+  const [mode,setMode]=useState("niveau1");
+  const [questionCount,setQuestionCount]=useState(10);
+  const [timeLimit,setTimeLimit]=useState(5);
+  const [started,setStarted]=useState(false);
+  const [finished,setFinished]=useState(false);
+  const [answers,setAnswers]=useState([]);
+  const [tick,setTick]=useState(0);
+  const [idx,setIdx]=useState(0);
+  const [items,setItems]=useState([]);
+  const [one,setOne]=useState("");
+  const [a,setA]=useState(""),[b,setB]=useState(""),[r,setR]=useState("");
+
   useEffect(()=>{ if(!started||finished) return; const id=setInterval(()=>setTick(t=>t+1),1000); return ()=>clearInterval(id);},[started,finished]);
-  const init=()=>{ let list=[]; if(mode==="decouverte"){ for(let i=0;i<questionCount;i++){ const x=rand(0,5), y=rand(0,5); list.push({a:x,b:y,r:x+y}); } } 
+
+  const init=()=>{
+    let list=[];
+    const make=(min,max)=>rand(min,max);
+    if(mode==="niveau1"){ for(let i=0;i<questionCount;i++){ const x=make(1,4),y=make(1,4); list.push({a:x,b:y,r:x+y}); } }
+    else if(mode==="niveau2"){ for(let i=0;i<questionCount;i++){ const x=make(1,9),y=make(1,9); list.push({a:x,b:y,r:x+y}); } }
+    else if(mode==="niveau3"){ for(let i=0;i<questionCount;i++){ let x=make(1,49),y=make(1,49-x%10); if((x%10)+(y%10)>=10) i--; else list.push({a:x,b:y,r:x+y}); } }
+    else if(mode==="niveau4"){ for(let i=0;i<questionCount;i++){ const x=make(1,9)*10, y=make(1,9)*10; list.push({a:x,b:y,r:x+y}); } }
+    else if(mode==="niveau5"){ for(let i=0;i<questionCount;i++){ let x=make(10,90),y=make(10,90); if((x%10)+(y%10)>=10) i--; else list.push({a:x,b:y,r:x+y}); } }
+    else if(mode==="niveau6"){ for(let i=0;i<questionCount;i++){ const x=make(10,90),y=make(10,90); list.push({a:x,b:y,r:x+y}); } }
+    else if(mode==="decouverte"){ for(let i=0;i<questionCount;i++){ let x=make(0,5),y=make(0,5); if(x+y===0){i--;continue;} list.push({a:x,b:y,r:x+y}); } }
     else if(mode==="doubles"){ list=shuffle(Array.from({length:10},(_,i)=>({a:i+1,b:i+1,r:2*(i+1)}))).slice(0,questionCount); }
     else if(mode==="moities"){ const evens=shuffle(Array.from({length:10},(_,i)=>(i+1)*2)); list=evens.slice(0,Math.min(questionCount,evens.length)).map(t=>({total:t,half:t/2})); }
-    else if(mode==="trou"){ const layouts=["a+_=r","_=b=r","r=a+_"]; for(let i=0;i<questionCount;i++){ const x=rand(0,10), y=rand(0,10-x), r=x+y, L=layouts[rand(0,2)]; list.push({a:x,b:y,r,layout:L}); } }
-    else { for(let i=0;i<questionCount;i++){ const pick=rand(1,3); if(pick===1){ const x=rand(0,10), y=rand(0,10-x); list.push({kind:"simple",a:x,b:y,r:x+y}); } else if(pick===2){ const n=rand(1,10); list.push({kind:"double",a:n,b:n,r:2*n}); } else { const x=rand(0,10), y=rand(0,10-x), r=x+y; const L=["a+_=r","_=b=r","r=a+_"][rand(0,2)]; list.push({kind:"trou",a:x,b:y,r,layout:L}); } } }
+    else if(mode==="trou"){ const layouts=["a+_=r","_=b=r","r=a+_"]; for(let i=0;i<questionCount;i++){ const x=make(0,10),y=make(0,10-x),r=x+y,L=layouts[rand(0,2)]; list.push({a:x,b:y,r,layout:L}); } }
+    else { for(let i=0;i<questionCount;i++){ const pick=rand(1,3); if(pick===1){ const x=make(0,10),y=make(0,10-x); list.push({kind:"simple",a:x,b:y,r:x+y}); }
+      else if(pick===2){ const n=make(1,10); list.push({kind:"double",a:n,b:n,r:2*n}); }
+      else { const x=make(0,10),y=make(0,10-x),r=x+y,L=["a+_=r","_=b=r","r=a+_"][rand(0,2)]; list.push({kind:"trou",a:x,b:y,r,layout:L}); } } }
     setItems(list); setIdx(0); setAnswers([]); setTick(0); setA(""); setB(""); setR(""); setOne(""); setStarted(true); setFinished(false);
   };
+
   useEffect(()=>{ if(!started||finished) return; if(timeLimit!=null && tick>=timeLimit){ vibrate(); submit(true);} },[tick]);
-  const current=items[idx]; const remaining=timeLimit==null?null:Math.max(0,timeLimit-tick);
+
+  const current=items[idx];
+
   const submit=(timeout=false)=>{
-    if(!current) return; let right=false, userStr=null, qtxt="", goodTxt="";
-    if(mode==="decouverte"){ const ai=parseInt(a,10), bi=parseInt(b,10), ri=parseInt(r,10); const provided=Number.isInteger(ai)&&Number.isInteger(bi)&&Number.isInteger(ri);
-      right=!timeout && provided && ai===current.a && bi===current.b && ri===current.r; userStr=provided?`${ai} + ${bi} = ${ri}`:null; qtxt=`${current.a} + ${current.b} = ${current.r}`; goodTxt=qtxt; }
-    else if(mode==="doubles"){ const guess=parseInt(one,10); right=!timeout && Number.isInteger(guess) && guess===current.r; userStr=Number.isInteger(guess)?String(guess):null; qtxt=`${current.a} + ${current.b} = ?`; goodTxt=String(current.r); }
-    else if(mode==="moities"){ const guess=parseInt(one,10); right=!timeout && Number.isInteger(guess) && 2*guess===current.total; userStr=Number.isInteger(guess)?String(guess):null; qtxt=`Moitié de ${current.total}`; goodTxt=String(current.half); }
-    else if(mode==="trou"){ const guess=parseInt(one,10); let expected; if(current.layout==="a+_=r"){ expected=current.r-current.a; qtxt=`${current.a} + [ ] = ${current.r}`; } else if(current.layout==="_=b=r"){ expected=current.r-current.b; qtxt=`[ ] + ${current.b} = ${current.r}`;} else { expected=current.r-current.a; qtxt=`${current.r} = ${current.a} + [ ]`; } right=!timeout && Number.isInteger(guess) && guess===expected; userStr=Number.isInteger(guess)?String(guess):null; goodTxt=String(expected); }
-    else { if(current.kind==="simple"){ const guess=parseInt(one,10); right=!timeout && Number.isInteger(guess)&&guess===current.r; userStr=Number.isInteger(guess)?String(guess):null; qtxt=`${current.a} + ${current.b} = ?`; goodTxt=String(current.r); }
-      else if(current.kind==="double"){ const guess=parseInt(one,10); right=!timeout && Number.isInteger(guess)&&guess===current.r; userStr=Number.isInteger(guess)?String(guess):null; qtxt=`${current.a} + ${current.b} = ?`; goodTxt=String(current.r); }
-      else { const guess=parseInt(one,10); let expected; if(current.layout==="a+_=r"){ expected=current.r-current.a; qtxt=`${current.a} + [ ] = ${current.r}`; } else if(current.layout==="_=b=r"){ expected=current.r-current.b; qtxt=`[ ] + ${current.b} = ${current.r}`;} else { expected=current.r-current.a; qtxt=`${current.r} = ${current.a} + [ ]`; } right=!timeout && Number.isInteger(guess)&&guess===expected; userStr=Number.isInteger(guess)?String(guess):null; goodTxt=String(expected); } }
+    if(!current) return;
+    let right=false,userStr=null,qtxt="",goodTxt="";
+    if(["niveau1","niveau2","niveau3","niveau4","niveau5","niveau6","decouverte"].includes(mode)){
+      const ai=parseInt(a,10),bi=parseInt(b,10),ri=parseInt(r,10);
+      right=!timeout && ai+bi===ri;
+      userStr=Number.isInteger(ri)?`${ai}+${bi}=${ri}`:null;
+      qtxt=`${current.a} + ${current.b} = ${current.r}`; goodTxt=qtxt;
+    } 
+    else if(mode==="doubles"){ const guess=parseInt(one,10); right=!timeout && guess===current.r; userStr=String(guess); qtxt=`${current.a}+${current.b}=?`; goodTxt=String(current.r);}
+    else if(mode==="moities"){ const guess=parseInt(one,10); right=!timeout && 2*guess===current.total; userStr=String(guess); qtxt=`Moitié de ${current.total}`; goodTxt=String(current.half);}
+    else if(mode==="trou"){ const guess=parseInt(one,10); let expected; if(current.layout==="a+_=r"){expected=current.r-current.a;qtxt=`${current.a}+?=${current.r}`;}
+      else if(current.layout==="_=b=r"){expected=current.r-current.b;qtxt=`?+${current.b}=${current.r}`;}
+      else {expected=current.r-current.a;qtxt=`${current.r}=${current.a}+?`;}
+      right=!timeout && guess===expected; userStr=String(guess); goodTxt=String(expected);
+    }
+    else { const guess=parseInt(one,10); right=!timeout && guess===current.r; userStr=String(guess); qtxt=`${current.a}+${current.b}=?`; goodTxt=String(current.r);}
     setAnswers(p=>[...p,{q:qtxt,good:goodTxt,user:userStr,correct:right,timeout}]);
     if(idx+1>=items.length){ setFinished(true); setStarted(false);} else { setIdx(i=>i+1); setTick(0); setA(""); setB(""); setR(""); setOne(""); }
   };
-  return (<div className={(acc.black?"dark-mode ":"")+(acc.yellow && !acc.black?"yellow-mode ":"")+"min-h-screen p-6"} style={{backgroundColor:acc.rootBg,color:acc.rootText}}>
+
+  return (<div className="min-h-screen p-6" style={{backgroundColor:acc.rootBg,color:acc.rootText}}>
     <div className="max-w-5xl mx-auto space-y-6">
-      {!started && !finished && (<div className="grid md:grid-cols-3 gap-4">
+      {!started && !finished && (
+      <div className="grid md:grid-cols-3 gap-4">
         <AccessibilityCard acc={acc}/>
         <div className="card rounded-2xl p-4" style={acc.cardStyle}>
           <div className="font-bold mb-2">Mode</div>
           <div className="grid gap-1">
-            <label><input type="radio" name="m1" checked={mode==="decouverte"} onChange={()=>setMode("decouverte")}/> Découverte visuelle (écrire l’addition)</label>
-            <label><input type="radio" name="m1" checked={mode==="doubles"} onChange={()=>setMode("doubles")}/> Doubles (ordre aléatoire)</label>
-            <label><input type="radio" name="m1" checked={mode==="moities"} onChange={()=>setMode("moities")}/> Moitiés</label>
-            <label><input type="radio" name="m1" checked={mode==="trou"} onChange={()=>setMode("trou")}/> Additions à trou</label>
-            <label><input type="radio" name="m1" checked={mode==="defis"} onChange={()=>setMode("defis")}/> Défis mélangés</label>
+            <label><input type="radio" checked={mode==="niveau1"} onChange={()=>setMode("niveau1")}/> Niveau 1 — nombres &lt; 5</label>
+            <label><input type="radio" checked={mode==="niveau2"} onChange={()=>setMode("niveau2")}/> Niveau 2 — nombres ≤ 10</label>
+            <label><input type="radio" checked={mode==="niveau3"} onChange={()=>setMode("niveau3")}/> Niveau 3 — &lt; 50 (sans retenue)</label>
+            <label><input type="radio" checked={mode==="niveau4"} onChange={()=>setMode("niveau4")}/> Niveau 4 — additions des chefs (dizaines)</label>
+            <label><input type="radio" checked={mode==="niveau5"} onChange={()=>setMode("niveau5")}/> Niveau 5 — &lt; 100 sans retenue</label>
+            <label><input type="radio" checked={mode==="niveau6"} onChange={()=>setMode("niveau6")}/> Niveau 6 — &lt; 100 avec retenue</label>
+            <label><input type="radio" checked={mode==="decouverte"} onChange={()=>setMode("decouverte")}/> Découverte visuelle</label>
+            <label><input type="radio" checked={mode==="doubles"} onChange={()=>setMode("doubles")}/> Doubles</label>
+            <label><input type="radio" checked={mode==="moities"} onChange={()=>setMode("moities")}/> Moitiés</label>
+            <label><input type="radio" checked={mode==="trou"} onChange={()=>setMode("trou")}/> Additions à trou</label>
+            <label><input type="radio" checked={mode==="defis"} onChange={()=>setMode("defis")}/> Défis mélangés</label>
           </div>
-          <div className="font-bold mt-3 mb-1">Nombre de questions</div>
-          <div className="flex gap-2 flex-wrap">{[5,10,15,20].map(n=><button key={n} onClick={()=>setQuestionCount(n)} className={"pill "+(questionCount===n?"active":"")}>{n}</button>)}</div>
-          <div className="font-bold mt-3 mb-1">Temps par question</div>
-          <div className="flex gap-2 flex-wrap">{[3,5,10].map(s=><button key={s} onClick={()=>setTimeLimit(s)} className={"pill "+(timeLimit===s?"active":"")}>{s}s</button>)}<button onClick={()=>setTimeLimit(null)} className={"pill "+(timeLimit==null?"active":"")}>Pas de chrono</button></div>
+
+                  <div className="font-bold mt-3 mb-1">Nombre de questions</div>
+        <div className="flex gap-2 flex-wrap">
+          {[5,10,15,20].map(n=>
+            <button key={n} onClick={()=>setQuestionCount(n)} className={"pill "+(questionCount===n?"active":"")}>{n}</button>)}
         </div>
-        <div className="card rounded-2xl p-4" style={acc.cardStyle}><div className="font-bold mb-2">Action</div><button onClick={init} className="px-4 py-2 rounded-2xl text-white" style={{backgroundColor:BRAND}}>Commencer</button></div>
-      </div>)}
-      {started && items[idx] && (<>
+        <div className="font-bold mt-3 mb-1">Temps par question</div>
+        <div className="flex gap-2 flex-wrap">
+          {[3,5,10].map(s=>
+            <button key={s} onClick={()=>setTimeLimit(s)} className={"pill "+(timeLimit===s?"active":"")}>{s}s</button>)}
+          <button onClick={()=>setTimeLimit(null)} className={"pill "+(timeLimit==null?"active":"")}>Pas de chrono</button>
+        </div>
+      </div>
+      <div className="card rounded-2xl p-4" style={acc.cardStyle}>
+        <div className="font-bold mb-2">Action</div>
+        <button onClick={init} className="px-4 py-2 rounded-2xl text-white" style={{backgroundColor:BRAND}}>Commencer</button>
+      </div>
+    </div>)}
+
+    {started && current && (
+      <div className="space-y-4">
         <div className="card rounded-2xl p-3" style={acc.cardStyle}>
-          <div className="flex items-center justify-between"><div><strong>Question :</strong> {idx+1} / {items.length}</div><div><strong>⏱ Temps :</strong> {timeLimit==null?"Pas de chrono":`${Math.max(0,(timeLimit - tick))}s`}</div></div>
+          <div className="flex items-center justify-between">
+            <div><strong>Question :</strong> {idx+1}/{items.length}</div>
+            <div><strong>⏱ Temps :</strong> {timeLimit==null?"∞":`${Math.max(0,(timeLimit - tick))}s`}</div>
+          </div>
           <Progress remaining={timeLimit==null?0:Math.max(0,timeLimit - tick)} total={timeLimit}/>
         </div>
-        {mode==="decouverte" && (<div className="rounded-3xl border p-6 text-center shadow-sm card" style={acc.cardStyle}>
-          <div className="mb-4 text-slate-700">Observe les bulles puis écris l’addition</div>
-          <div className="flex gap-8 justify-center items-center mb-4">
-            <div className="flex gap-2 flex-wrap">{Array.from({length:items[idx].a}).map((_,i)=>(<div key={i} className="h-6 w-6 rounded-full" style={{background:"#7ad1c9"}}/>))}</div>
-            <div className="text-3xl font-bold">+</div>
-            <div className="flex gap-2 flex-wrap">{Array.from({length:items[idx].b}).map((_,i)=>(<div key={i} className="h-6 w-6 rounded-full" style={{background:"#ffd9b3"}}/>))}</div>
+
+        {mode==="decouverte" && (
+          <div className="card rounded-2xl p-6 text-center" style={acc.cardStyle}>
+            <div className="mb-4 text-slate-700">Observe les bulles puis écris l’addition</div>
+            <div className="flex gap-8 justify-center items-center mb-4">
+              <div className="flex gap-2 flex-wrap">{Array.from({length:current.a}).map((_,i)=>(<div key={i} className="h-6 w-6 rounded-full" style={{background:"#7ad1c9"}}/>))}</div>
+              <div className="text-3xl font-bold">+</div>
+              <div className="flex gap-2 flex-wrap">{Array.from({length:current.b}).map((_,i)=>(<div key={i} className="h-6 w-6 rounded-full" style={{background:"#ffd9b3"}}/>))}</div>
+            </div>
+            <form onSubmit={e=>{e.preventDefault();submit(false);}} className="flex gap-3 justify-center items-center">
+              <input value={a} onChange={e=>setA(e.target.value.replace(/\D/g,""))} inputMode="numeric" className="w-20 text-center text-2xl px-3 py-2 rounded-2xl border violet-border fill-hint diag-txt"/>
+              <span className="text-2xl font-bold">+</span>
+              <input value={b} onChange={e=>setB(e.target.value.replace(/\D/g,""))} inputMode="numeric" className="w-20 text-center text-2xl px-3 py-2 rounded-2xl border violet-border fill-hint diag-txt"/>
+              <span className="text-2xl font-bold">=</span>
+              <input value={r} onChange={e=>setR(e.target.value.replace(/\D/g,""))} inputMode="numeric" className="w-20 text-center text-2xl px-3 py-2 rounded-2xl border violet-border fill-hint diag-txt"/>
+              <button className="px-5 py-3 rounded-2xl text-white font-semibold shadow" style={{backgroundColor:BRAND}} type="submit">Valider</button>
+            </form>
           </div>
-          <form onSubmit={(e)=>{e.preventDefault(); submit(false);}} className="flex gap-3 justify-center items-center">
-            <input value={a} onChange={e=>setA(e.target.value.replace(/\D/g,""))} inputMode="numeric" className="w-20 text-center text-2xl px-3 py-2 rounded-2xl border violet-border fill-hint diag-txt"/>
-            <span className="text-2xl font-bold">+</span>
-            <input value={b} onChange={e=>setB(e.target.value.replace(/\D/g,""))} inputMode="numeric" className="w-20 text-center text-2xl px-3 py-2 rounded-2xl border violet-border fill-hint diag-txt"/>
-            <span className="text-2xl font-bold">=</span>
-            <input value={r} onChange={e=>setR(e.target.value.replace(/\D/g,""))} inputMode="numeric" className="w-20 text-center text-2xl px-3 py-2 rounded-2xl border violet-border fill-hint diag-txt"/>
-            <button className="px-5 py-3 rounded-2xl text-white font-semibold shadow" style={{backgroundColor:BRAND}} type="submit">Valider</button>
-          </form>
-        </div>)}
-        {mode!=="decouverte" && (<div className="rounded-3xl border p-6 text-center shadow-sm card" style={acc.cardStyle}>
-          {mode==="doubles" && <div className="text-4xl font-black mb-4">{items[idx].a} + {items[idx].b} = ?</div>}
-          {mode==="moities" && <div className="text-4xl font-black mb-4">Moitié de {items[idx].total} = ?</div>}
-          {mode==="trou" && (<div className="text-4xl font-black mb-4">
-            {items[idx].layout==="a+_=r" && <>{items[idx].a} + <span className="inline-block px-3 py-1 rounded-2xl border violet-border">[ case ]</span> = {items[idx].r}</>}
-            {items[idx].layout==="_=b=r" && <><span className="inline-block px-3 py-1 rounded-2xl border violet-border">[ case ]</span> + {items[idx].b} = {items[idx].r}</>}
-            {items[idx].layout==="r=a+_" && <>{items[idx].r} = {items[idx].a} + <span className="inline-block px-3 py-1 rounded-2xl border violet-border">[ case ]</span></>}
-          </div>)}
-          {mode==="defis" && (<div className="text-4xl font-black mb-4">
-            {items[idx].kind==="simple"  && <>{items[idx].a} + {items[idx].b} = ?</>}
-            {items[idx].kind==="double"  && <>{items[idx].a} + {items[idx].b} = ?</>}
-            {items[idx].kind==="trou"    && (<>
-              {items[idx].layout==="a+_=r" && <>{items[idx].a} + <span className="inline-block px-3 py-1 rounded-2xl border violet-border">[ case ]</span> = {items[idx].r}</>}
-              {items[idx].layout==="_=b=r" && <><span className="inline-block px-3 py-1 rounded-2xl border violet-border">[ case ]</span> + {items[idx].b} = {items[idx].r}</>}
-              {items[idx].layout==="r=a+_" && <>{items[idx].r} = {items[idx].a} + <span className="inline-block px-3 py-1 rounded-2xl border violet-border">[ case ]</span></>}
-            </>)}
-          </div>)}
-          <form onSubmit={(e)=>{e.preventDefault(); submit(false);}} className="flex gap-3 justify-center items-center">
-            <input value={one} onChange={e=>setOne(e.target.value.replace(/\D/g,""))} inputMode="numeric" className="w-28 text-center text-3xl px-4 py-3 rounded-2xl border violet-border fill-hint diag-txt"/>
-            <button className="px-5 py-3 rounded-2xl text-white font-semibold shadow" style={{backgroundColor:BRAND}} type="submit">Valider</button>
-          </form>
-        </div>)}
-      </>)}
-      {finished && <Recap answers={answers} cardStyle={acc.cardStyle} onReplay={()=>{ setStarted(false); setFinished(false); setAnswers([]); setIdx(0); setItems([]); setTick(0); }}/>}        
-      <div className="mt-6"><a href="#/" className="px-4 py-2 rounded-2xl border">Retour au menu</a></div>
-    </div>
+        )}
+
+        {mode==="trou" && (
+          <div className="card rounded-2xl p-6 text-center" style={acc.cardStyle}>
+            <div className="text-4xl font-black mb-4">
+              {current.layout==="a+_=r" && <>{current.a} + ? = {current.r}</>}
+              {current.layout==="_=b=r" && <>? + {current.b} = {current.r}</>}
+              {current.layout==="r=a+_" && <>{current.r} = {current.a} + ?</>}
+            </div>
+            <form onSubmit={e=>{e.preventDefault();submit(false);}} className="flex gap-3 justify-center items-center">
+              <input value={one} onChange={e=>setOne(e.target.value.replace(/\D/g,""))} inputMode="numeric" className="w-28 text-center text-3xl px-4 py-3 rounded-2xl border violet-border fill-hint diag-txt"/>
+              <button className="px-5 py-3 rounded-2xl text-white font-semibold shadow" style={{backgroundColor:BRAND}} type="submit">Valider</button>
+            </form>
+          </div>
+        )}
+
+        {finished && <Recap answers={answers} cardStyle={acc.cardStyle} onReplay={()=>{setStarted(false);setFinished(false);setAnswers([]);setIdx(0);setItems([]);setTick(0);}}/>}
+      </div>
+    )}
   </div>);
 }
+
+/* ----------------------- SOUSTRACTIONS --------------------- */
 function GameSub({acc}){
   const {rootBg,rootText,cardStyle}=acc;
-  const [mode,setMode]=useState("decouverte"); const [questionCount,setQuestionCount]=useState(10); const [timeLimit,setTimeLimit]=useState(5);
-  const [started,setStarted]=useState(false), [finished,setFinished]=useState(false); const [answers,setAnswers]=useState([]); const [tick,setTick]=useState(0);
-  const [idx,setIdx]=useState(0); const [items,setItems]=useState([]); const [one,setOne]=useState("");
+  const [mode,setMode]=useState("niveau1");
+  const [questionCount,setQuestionCount]=useState(10);
+  const [timeLimit,setTimeLimit]=useState(5);
+  const [started,setStarted]=useState(false);
+  const [finished,setFinished]=useState(false);
+  const [answers,setAnswers]=useState([]);
+  const [tick,setTick]=useState(0);
+  const [idx,setIdx]=useState(0);
+  const [items,setItems]=useState([]);
+  const [one,setOne]=useState("");
+
   useEffect(()=>{ if(!started||finished) return; const id=setInterval(()=>setTick(t=>t+1),1000); return ()=>clearInterval(id);},[started,finished]);
-  const init=()=>{ let list=[]; if(mode==="decouverte"){ for(let i=0;i<questionCount;i++){ const a=rand(1,10), b=rand(0,a); list.push({a,b,r:a-b}); } }
-    else if(mode==="trou"){ const L=["a-_=r","_=b=r-","r=_-b"]; for(let i=0;i<questionCount;i++){ const a=rand(0,10), b=rand(0,a), r=a-b; list.push({a,b,r,layout:L[rand(0,2)]}); } }
-    else { for(let i=0;i<questionCount;i++){ const a=rand(0,10), b=rand(0,a); if(Math.random()<0.5) list.push({kind:"simple",a,b,r:a-b}); else { const L=["a-_=r","_=b=r-","r=_-b"][rand(0,2)]; list.push({kind:"trou",a,b,r:a-b,layout:L}); } } }
+
+  const init=()=>{
+    let list=[];
+    if(mode==="niveau1"){ for(let i=0;i<questionCount;i++){ const a=rand(1,4),b=rand(0,a); list.push({a,b,r:a-b}); } }
+    else if(mode==="niveau2"){ for(let i=0;i<questionCount;i++){ const a=rand(1,9),b=rand(0,a); list.push({a,b,r:a-b}); } }
+    else if(mode==="niveau3"){ for(let i=0;i<questionCount;i++){ const a=rand(2,9)*10,b=rand(1,(a/10)-1)*10; list.push({a,b,r:a-b}); } }
+    else if(mode==="trou"){ const L=["a-_=r","_=b=r-","r=_-b"]; for(let i=0;i<questionCount;i++){ const a=rand(1,10),b=rand(0,a),r=a-b; list.push({a,b,r,layout:L[rand(0,2)]}); } }
+    else { for(let i=0;i<questionCount;i++){ const a=rand(1,10),b=rand(0,a); if(Math.random()<0.5) list.push({kind:"simple",a,b,r:a-b}); else {const L=["a-_=r","_=b=r-","r=_-b"][rand(0,2)]; list.push({kind:"trou",a,b,r:a-b,layout:L});}}}
     setItems(list); setIdx(0); setAnswers([]); setTick(0); setOne(""); setStarted(true); setFinished(false);
   };
+
   useEffect(()=>{ if(!started||finished) return; if(timeLimit!=null && tick>=timeLimit){ vibrate(); submit(true);} },[tick]);
-  const current=items[idx]; const remaining=timeLimit==null?null:Math.max(0,timeLimit-tick);
-  const submit=(timeout=false)=>{ if(!current) return; let right=false, user=null, qtxt="", goodTxt="";
-    if(mode==="decouverte"){ const guess=parseInt(one,10); right=!timeout && Number.isInteger(guess) && guess===current.r; user=Number.isInteger(guess)?String(guess):null; qtxt=`${current.a} – ${current.b} = ?`; goodTxt=String(current.r); }
-    else if(mode==="trou"){ const guess=parseInt(one,10); let expected; if(current.layout==="a-_=r"){ expected=current.a-current.r; qtxt=`${current.a} – [ ] = ${current.r}`; } else if(current.layout==="_=b=r-"){ expected=current.r+current.b; qtxt=`[ ] – ${current.b} = ${current.r}`; } else { expected=current.r+current.b; qtxt=`${current.r} = [ ] – ${current.b}`; } right=!timeout && Number.isInteger(guess)&&guess===expected; user=Number.isInteger(guess)?String(guess):null; goodTxt=String(expected); }
-    else { const guess=parseInt(one,10); if(current.kind==="simple"){ right=!timeout && Number.isInteger(guess)&&guess===current.r; user=Number.isInteger(guess)?String(guess):null; qtxt=`${current.a} – ${current.b} = ?`; goodTxt=String(current.r); }
-      else { let expected; if(current.layout==="a-_=r"){ expected=current.a-current.r; qtxt=`${current.a} – [ ] = ${current.r}`; } else if(current.layout==="_=b=r-"){ expected=current.r+current.b; qtxt=`[ ] – ${current.b} = ${current.r}`; } else { expected=current.r+current.b; qtxt=`${current.r} = [ ] – ${current.b}`; } right=!timeout && Number.isInteger(guess)&&guess===expected; user=Number.isInteger(guess)?String(guess):null; goodTxt=String(expected); } }
+
+  const current=items[idx];
+
+  const submit=(timeout=false)=>{
+    if(!current) return;
+    let right=false,user=null,qtxt="",goodTxt="";
+    if(["niveau1","niveau2","niveau3"].includes(mode)){
+      const guess=parseInt(one,10); right=!timeout && guess===current.r;
+      user=String(guess); qtxt=`${current.a} - ${current.b} = ?`; goodTxt=String(current.r);
+    }
+    else if(mode==="trou"){ const guess=parseInt(one,10); let expected;
+      if(current.layout==="a-_=r"){expected=current.a-current.r;qtxt=`${current.a} - ? = ${current.r}`;}
+      else if(current.layout==="_=b=r-"){expected=current.r+current.b;qtxt=`? - ${current.b} = ${current.r}`;}
+      else {expected=current.r+current.b;qtxt=`${current.r} = ? - ${current.b}`;}
+      right=!timeout && guess===expected; user=String(guess); goodTxt=String(expected);
+    }
+    else {const guess=parseInt(one,10); right=!timeout && guess===current.r; user=String(guess); qtxt=`${current.a}-${current.b}=?`; goodTxt=String(current.r);}
     setAnswers(p=>[...p,{q:qtxt,good:goodTxt,user,correct:right,timeout}]);
-    if(idx+1>=items.length){ setFinished(true); setStarted(false);} else { setIdx(i=>i+1); setTick(0); setOne(""); }
+    if(idx+1>=items.length){setFinished(true);setStarted(false);} else {setIdx(i=>i+1);setTick(0);setOne("");}
   };
-  return (<div className={(acc.black?"dark-mode ":"")+(acc.yellow && !acc.black?"yellow-mode ":"")+"min-h-screen p-6"} style={{backgroundColor:acc.rootBg,color:acc.rootText}}>
+
+  return (<div className="min-h-screen p-6" style={{backgroundColor:rootBg,color:rootText}}>
     <div className="max-w-5xl mx-auto space-y-6">
-      {!started && !finished && (<div className="grid md:grid-cols-3 gap-4">
-        <AccessibilityCard acc={acc}/>
-        <div className="card rounded-2xl p-4" style={acc.cardStyle}>
-          <div className="font-bold mb-2">Mode</div>
-          <div className="grid gap-1">
-            <label><input type="radio" name="m2" checked={mode==="decouverte"} onChange={()=>setMode("decouverte")}/> Découverte visuelle</label>
-            <label><input type="radio" name="m2" checked={mode==="trou"} onChange={()=>setMode("trou")}/> Soustractions à trou</label>
-            <label><input type="radio" name="m2" checked={mode==="defis"} onChange={()=>setMode("defis")}/> Défis mélangés</label>
+      {!started && !finished && (
+        <div className="grid md:grid-cols-3 gap-4">
+          <AccessibilityCard acc={acc}/>
+          <div className="card rounded-2xl p-4" style={cardStyle}>
+            <div className="font-bold mb-2">Mode</div>
+            <div className="grid gap-1">
+              <label><input type="radio" checked={mode==="niveau1"} onChange={()=>setMode("niveau1")}/> Niveau 1 — nombres &lt; 5</label>
+              <label><input type="radio" checked={mode==="niveau2"} onChange={()=>setMode("niveau2")}/> Niveau 2 — nombres ≤ 10</label>
+              <label><input type="radio" checked={mode==="niveau3"} onChange={()=>setMode("niveau3")}/> Niveau 3 — les chefs (dizaines)</label>
+              <label><input type="radio" checked={mode==="trou"} onChange={()=>setMode("trou")}/> Soustractions à trou</label>
+              <label><input type="radio" checked={mode==="defis"} onChange={()=>setMode("defis")}/> Défis mélangés</label>
+            </div>
+            <div className="font-bold mt-3 mb-1">Nombre de questions</div>
+            <div className="flex gap-2 flex-wrap">{[5,10,15,20].map(n=><button key={n} onClick={()=>setQuestionCount(n)} className={"pill "+(questionCount===n?"active":"")}>{n}</button>)}</div>
+            <div className="font-bold mt-3 mb-1">Temps par question</div>
+            <div className="flex gap-2 flex-wrap">{[3,5,10].map(s=><button key={s} onClick={()=>setTimeLimit(s)} className={"pill "+(timeLimit===s?"active":"")}>{s}s</button>)}<button onClick={()=>setTimeLimit(null)} className={"pill "+(timeLimit==null?"active":"")}>Pas de chrono</button></div>
           </div>
-          <div className="font-bold mt-3 mb-1">Nombre de questions</div>
-          <div className="flex gap-2 flex-wrap">{[5,10,15,20].map(n=><button key={n} onClick={()=>setQuestionCount(n)} className={"pill "+(questionCount===n?"active":"")}>{n}</button>)}</div>
-          <div className="font-bold mt-3 mb-1">Temps par question</div>
-          <div className="flex gap-2 flex-wrap">{[3,5,10].map(s=><button key={s} onClick={()=>setTimeLimit(s)} className={"pill "+(timeLimit===s?"active":"")}>{s}s</button>)}<button onClick={()=>setTimeLimit(null)} className={"pill "+(timeLimit==null?"active":"")}>Pas de chrono</button></div>
+          <div className="card rounded-2xl p-4" style={cardStyle}><div className="font-bold mb-2">Action</div><button onClick={init} className="px-4 py-2 rounded-2xl text-white" style={{backgroundColor:BRAND}}>Commencer</button></div>
         </div>
-        <div className="card rounded-2xl p-4" style={acc.cardStyle}><div className="font-bold mb-2">Action</div><button onClick={init} className="px-4 py-2 rounded-2xl text-white" style={{backgroundColor:BRAND}}>Commencer</button></div>
-      </div>)}
-      {started && items[idx] && (<>
-        <div className="card rounded-2xl p-3" style={acc.cardStyle}><div className="flex items-center justify-between"><div><strong>Question :</strong> {idx+1} / {items.length}</div><div><strong>⏱ Temps :</strong> {timeLimit==null?"Pas de chrono":`${Math.max(0,(timeLimit - tick))}s`}</div></div><Progress remaining={timeLimit==null?0:Math.max(0,timeLimit - tick)} total={timeLimit}/></div>
-        <div className="rounded-3xl border p-6 text-center shadow-sm card" style={acc.cardStyle}>
-          <div className="text-4xl font-black mb-4">
-            {mode==="decouverte" && <>{items[idx].a} – {items[idx].b} = ?</>}
-            {mode!=="decouverte" && (<>
-              {items[idx].kind==="simple" && <>{items[idx].a} – {items[idx].b} = ?</>}
-              {items[idx].kind==="trou" && (<>
-                {items[idx].layout==="a-_=r"   && <>{items[idx].a} – <span className="inline-block px-3 py-1 rounded-2xl border violet-border">[ case ]</span> = {items[idx].r}</>}
-                {items[idx].layout==="_=b=r-" && <><span className="inline-block px-3 py-1 rounded-2xl border violet-border">[ case ]</span> – {items[idx].b} = {items[idx].r}</>}
-                {items[idx].layout==="r=_-b"  && <>{items[idx].r} = <span className="inline-block px-3 py-1 rounded-2xl border violet-border">[ case ]</span> – {items[idx].b}</>}
-              </>)}
-            </>)}
+      )}
+      {started && current && (
+        <div className="space-y-4">
+          <div className="card rounded-2xl p-3" style={cardStyle}>
+            <div className="flex items-center justify-between"><div><strong>Question :</strong> {idx+1}/{items.length}</div><div><strong>⏱ Temps :</strong> {timeLimit==null?"∞":`${Math.max(0,(timeLimit - tick))}s`}</div></div>
+            <Progress remaining={timeLimit==null?0:Math.max(0,timeLimit - tick)} total={timeLimit}/>
           </div>
-          <form onSubmit={(e)=>{e.preventDefault(); submit(false);}} className="flex gap-3 justify-center items-center">
-            <input value={one} onChange={e=>setOne(e.target.value.replace(/\D/g,""))} inputMode="numeric" className="w-28 text-center text-3xl px-4 py-3 rounded-2xl border violet-border fill-hint diag-txt"/>
-            <button className="px-5 py-3 rounded-2xl text-white font-semibold shadow" style={{backgroundColor:BRAND}} type="submit">Valider</button>
-          </form>
+          <div className="card rounded-2xl p-6 text-center" style={cardStyle}>
+            <div className="flex justify-center gap-3 mb-4">
+              {Array.from({length:current.a}).map((_,i)=>
+                <div key={i} className="relative h-6 w-6 rounded-full" style={{background:"#7ad1c9"}}>
+                  {i<current.b && <div className="absolute inset-0"><div className="barred"></div></div>}
+                </div>)}
+            </div>
+            <div className="text-4xl font-black mb-4">{current.a} - {current.b} = ?</div>
+            <form onSubmit={e=>{e.preventDefault();submit(false);}} className="flex gap-3 justify-center items-center">
+              <input value={one} onChange={e=>setOne(e.target.value.replace(/\D/g,""))} inputMode="numeric" className="w-28 text-center text-3xl px-4 py-3 rounded-2xl border violet-border fill-hint diag-txt"/>
+              <button className="px-5 py-3 rounded-2xl text-white font-semibold shadow" style={{backgroundColor:BRAND}} type="submit">Valider</button>
+            </form>
+          </div>
         </div>
-      </>)}
-      {finished && <Recap answers={answers} cardStyle={acc.cardStyle} onReplay={()=>{ setStarted(false); setFinished(false); setAnswers([]); setIdx(0); setItems([]); setTick(0); }}/>}        
-      <div className="mt-6"><a href="#/" className="px-4 py-2 rounded-2xl border">Retour au menu</a></div>
+      )}
+      {finished && <Recap answers={answers} cardStyle={cardStyle} onReplay={()=>{setStarted(false);setFinished(false);setAnswers([]);setIdx(0);setItems([]);setTick(0);}}/>}
     </div>
   </div>);
 }
+
+/* ---------- Table de Pythagore (complète) ---------- */
 function GamePythaAdd({acc}){
   const A=range(1,10), B=range(1,10);
-  const [mode,setMode]=useState("random"); const [count,setCount]=useState(20); const [row,setRow]=useState(5);
-  const [values,setValues]=useState({}); const [checked,setChecked]=useState({}); const [feedback,setFeedback]=useState(null);
-  const blanks=useMemo(()=>{ const s=new Set(); if(mode==="random"){ const all=[]; for(const a of A)for(const b of B) all.push(`${a}+${b}`); while(s.size<Math.min(count,all.length)) s.add(all[Math.floor(Math.random()*all.length)]); } else { for(const b of B) s.add(`${row}+${b}`); } return s; },[mode,count,row]);
+  const [mode,setMode]=useState("random");
+  const [count,setCount]=useState(20);
+  const [row,setRow]=useState(5);
+  const [values,setValues]=useState({});
+  const [checked,setChecked]=useState({});
+  const [feedback,setFeedback]=useState(null);
+
+  const blanks=useMemo(()=>{
+    const s=new Set();
+    if(mode==="random"){
+      const all=[];
+      for(const a of A) for(const b of B) all.push(`${a}+${b}`);
+      while(s.size<Math.min(count,all.length)){
+        s.add(all[Math.floor(Math.random()*all.length)]);
+      }
+    }else{
+      for(const b of B) s.add(`${row}+${b}`);
+    }
+    return s;
+  },[mode,count,row]);
+
   const onChange=(k,v)=> setValues(p=>({...p,[k]:v.replace(/\D/g,"")}));
-  const check=()=>{ let total=0, errors=0; const res={}; for(const a of A)for(const b of B){ const k=`${a}+${b}`; if(!blanks.has(k)) continue; total++; const good=a+b; const v=values[k]; const ok=v!==undefined && v!=="" && Number(v)===good; res[k]=ok?"ok":"ko"; if(!ok) errors++; } setChecked(res); if(total>0){ if(errors===0) setFeedback({type:"ok",msg:"Bravo ! Toutes les réponses sont correctes 🎉"}); else setFeedback({type:"ko",msg:`Tu as ${errors} erreur${errors>1?"s":""}. Essaie encore !`}); } else setFeedback(null); };
+
+  const check=()=>{
+    let total=0, errors=0; const res={};
+    for(const a of A) for(const b of B){
+      const k=`${a}+${b}`;
+      if(!blanks.has(k)) continue;
+      total++;
+      const good=a+b;
+      const v=values[k];
+      const ok=v!==undefined && v!=="" && Number(v)===good;
+      res[k]=ok?"ok":"ko";
+      if(!ok) errors++;
+    }
+    setChecked(res);
+    if(total>0){
+      if(errors===0) setFeedback({type:"ok",msg:"Bravo ! Toutes les réponses sont correctes 🎉"});
+      else setFeedback({type:"ko",msg:`Tu as ${errors} erreur${errors>1?"s":""}. Essaie encore !`});
+    } else setFeedback(null);
+  };
+
   const reset=()=>{ setValues({}); setChecked({}); setFeedback(null); };
-  return (<div className={(acc.black?"dark-mode ":"")+(acc.yellow && !acc.black?"yellow-mode ":"")+"min-h-screen p-6"} style={{backgroundColor:acc.rootBg,color:acc.rootText}}>
-    <div className="max-w-6xl mx-auto">
-      <div className="grid xl:grid-cols-3 gap-4 mb-4">
-        <AccessibilityCard acc={acc}/>
-        <div className="card rounded-2xl p-4" style={acc.cardStyle}>
-          <div className="font-bold mb-2">Mode</div>
-          <div className="grid gap-2">
-            <label><input type="radio" name="mp" checked={mode==="random"} onChange={()=>setMode("random")}/> Cases aléatoires</label>
-            {mode==="random" && (<div className="ml-6"><label className="text-sm">Nombre de cases</label><input type="number" min="1" max="100" value={count} onChange={e=>setCount(parseInt(e.target.value)||1)} className="border rounded px-2 py-1 w-24 ml-2"/></div>)}
-            <label><input type="radio" name="mp" checked={mode==="row"} onChange={()=>setMode("row")}/> Ligne à compléter</label>
-            {mode==="row" && (<div className="ml-6"><label className="text-sm">Ligne (1..10)</label><select value={row} onChange={e=>setRow(parseInt(e.target.value))} className="border rounded px-2 py-1 ml-2">{A.map(t=><option key={t} value={t}>{t}</option>)}</select></div>)}
+
+  return (
+    <div className={(acc.black?"dark-mode ":"")+(acc.yellow && !acc.black?"yellow-mode ":"")+"min-h-screen p-6"} style={{backgroundColor:acc.rootBg,color:acc.rootText}}>
+      <div className="max-w-6xl mx-auto">
+        <div className="grid xl:grid-cols-3 gap-4 mb-4">
+          <AccessibilityCard acc={acc}/>
+          <div className="card rounded-2xl p-4" style={acc.cardStyle}>
+            <div className="font-bold mb-2">Mode</div>
+            <div className="grid gap-2">
+              <label><input type="radio" name="mp" checked={mode==="random"} onChange={()=>setMode("random")}/> Cases aléatoires</label>
+              {mode==="random" && (
+                <div className="ml-6">
+                  <label className="text-sm">Nombre de cases</label>
+                  <input type="number" min="1" max="100" value={count} onChange={e=>setCount(parseInt(e.target.value)||1)} className="border rounded px-2 py-1 w-24 ml-2"/>
+                </div>
+              )}
+              <label><input type="radio" name="mp" checked={mode==="row"} onChange={()=>setMode("row")}/> Ligne à compléter</label>
+              {mode==="row" && (
+                <div className="ml-6">
+                  <label className="text-sm">Ligne (1..10)</label>
+                  <select value={row} onChange={e=>setRow(parseInt(e.target.value))} className="border rounded px-2 py-1 ml-2">
+                    {A.map(t=><option key={t} value={t}>{t}</option>)}
+                  </select>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="card rounded-2xl p-4 space-y-3" style={acc.cardStyle}>
+            <div className="font-bold mb-2">Actions</div>
+            <button onClick={check} className="px-4 py-2 rounded-2xl text-white mr-2" style={{backgroundColor:BRAND}}>Corriger</button>
+            <button onClick={reset} className="px-4 py-2 rounded-2xl border">Réinitialiser</button>
+            {feedback && (
+              <div className={"bot-bubble "+feedback.type}>
+                <img src="dogbot.png" alt="DogBot"/>
+                <div className="msg">
+                  <div className="font-semibold" style={{color: feedback.type==="ok" ? "#16a34a" : "#dc2626"}}>DogBot</div>
+                  <div>{feedback.msg}</div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
-        <div className="card rounded-2xl p-4 space-y-3" style={acc.cardStyle}>
-          <div className="font-bold mb-2">Actions</div>
-          <button onClick={check} className="px-4 py-2 rounded-2xl text-white mr-2" style={{backgroundColor:BRAND}}>Corriger</button>
-          <button onClick={reset} className="px-4 py-2 rounded-2xl border">Réinitialiser</button>
-          {feedback && (<div className={"bot-bubble "+feedback.type}><img src="dogbot.png" alt="DogBot"/><div className="msg"><div className="font-semibold" style={{color: feedback.type==="ok" ? "#16a34a" : "#dc2626"}}>DogBot</div><div>{feedback.msg}</div></div></div>)}
+
+        <div className="card rounded-2xl p-3 mb-4" style={acc.cardStyle}>
+          <strong>Consigne :</strong> <span className="diag-txt">Complète uniquement les cases violettes. Les diagonales sont des doubles (a+a).</span>
         </div>
+
+        <div className="overflow-auto">
+          <table className="min-w-[900px] border-collapse w-full">
+            <thead>
+              <tr><th className="p-2 hdr text-left">+</th>{B.map(b=><th key={b} className="p-2 hdr">{b}</th>)}</tr>
+            </thead>
+            <tbody>
+              {A.map(a=>(
+                <tr key={a}>
+                  <th className="p-2 hdr text-left">{a}</th>
+                  {B.map(b=>{
+                    const k=`${a}+${b}`;
+                    const should=blanks.has(k);
+                    const st=checked[k];
+                    const base="border rounded px-2 py-2 w-[84px] text-center text-lg violet-border fill-hint diag-txt";
+                    return (
+                      <td key={k} className={"p-1 text-center "+(should?"fill-hint ":"")+(st==="ok"?" ok":st==="ko"?" ko":"")}>
+                        {should
+                          ? <input type="tel" value={values[k]||""} onChange={e=>onChange(k,e.target.value)} className={base}/>
+                          : <span className={"inline-block min-w-[84px] text-lg "+(a===b?"diag-txt":"")}>{a+b}</span>
+                        }
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="mt-6"><a href="#/" className="px-4 py-2 rounded-2xl border">Retour au menu</a></div>
       </div>
-      <div className="card rounded-2xl p-3 mb-4" style={acc.cardStyle}><strong>Consigne :</strong> <span className="diag-txt">Complète uniquement les cases violettes. Les diagonales sont des doubles (a+a).</span></div>
-      <div className="overflow-auto">
-        <table className="min-w-[900px] border-collapse w-full">
-          <thead><tr><th className="p-2 hdr text-left">+</th>{B.map(b=><th key={b} className="p-2 hdr">{b}</th>)}</tr></thead>
-          <tbody>
-            {A.map(a=>(<tr key={a}><th className="p-2 hdr text-left">{a}</th>
-              {B.map(b=>{ const k=`${a}+${b}`; const should=blanks.has(k); const st=checked[k]; const base="border rounded px-2 py-2 w-[84px] text-center text-lg violet-border fill-hint diag-txt";
-                return (<td key={k} className={"p-1 text-center "+(should?"fill-hint ":"")+(st==="ok"?" ok":st==="ko"?" ko":"")}>
-                  {should ? <input type="tel" value={values[k]||""} onChange={e=>onChange(k,e.target.value)} className={base}/> : <span className={"inline-block min-w-[84px] text-lg "+(a===b?"diag-txt":"")}>{a+b}</span>}
-                </td>);
-              })}
-            </tr>))}
-          </tbody>
-        </table>
-      </div>
-      <div className="mt-6"><a href="#/" className="px-4 py-2 rounded-2xl border">Retour au menu</a></div>
     </div>
-  </div>);
+  );
 }
-function Hero(){ return(<header className="p-6 text-center rounded-3xl card" style={{background:"#efe7ff"}}>
+
+/* ----------------------- HUB & APP ----------------------- */
+function Hero(){return(<header className="p-6 text-center rounded-3xl card" style={{background:"#efe7ff"}}>
   <h1 className="text-3xl font-extrabold" style={{color:"var(--brand)"}}>Ateliers d’additions & soustractions</h1>
   <p className="text-slate-700 mt-2">DogBot t’accompagne 🐾 — choisis ton jeu et tes réglages d’accessibilité.</p>
   <img src="dogbot.png" className="mx-auto mt-4 h-24 w-24 rounded-full bg-white p-1 shadow" alt="Dogbot"/>
 </header>);}
-function Hub({go}){ return(<main className="max-w-5xl mx-auto px-4 py-8"><Hero/><h2 className="text-center text-2xl font-extrabold my-4" style={{color:"var(--brand)"}}>Choisis ton activité</h2><div className="grid md:grid-cols-3 gap-6">
-  <article className="card p-6"><h3 className="text-xl font-extrabold text-[color:var(--brand)]">Jeu — Additions</h3><a onClick={()=>go("/add")} className="btn mt-4 inline-block cursor-pointer">Commencer</a></article>
-  <article className="card p-6"><h3 className="text-xl font-extrabold text-[color:var(--brand)]">Jeu — Soustractions</h3><a onClick={()=>go("/sub")} className="btn mt-4 inline-block cursor-pointer">Jouer</a></article>
-  <article className="card p-6"><h3 className="text-xl font-extrabold text-[color:var(--brand)]">Jeu — Table de Pythagore (additions)</h3><a onClick={()=>go("/pytha")} className="btn mt-4 inline-block cursor-pointer">Découvrir</a></article>
-</div></main>);}
+
+function Hub({go}){return(<main className="max-w-5xl mx-auto px-4 py-8">
+  <Hero/>
+  <h2 className="text-center text-2xl font-extrabold my-4" style={{color:"var(--brand)"}}>Choisis ton activité</h2>
+  <div className="grid md:grid-cols-3 gap-6">
+    <article className="card p-6"><h3 className="text-xl font-extrabold text-[color:var(--brand)]">Jeu — Additions</h3><a onClick={()=>go("/add")} className="btn mt-4 inline-block cursor-pointer">Commencer</a></article>
+    <article className="card p-6"><h3 className="text-xl font-extrabold text-[color:var(--brand)]">Jeu — Soustractions</h3><a onClick={()=>go("/sub")} className="btn mt-4 inline-block cursor-pointer">Jouer</a></article>
+    <article className="card p-6"><h3 className="text-xl font-extrabold text-[color:var(--brand)]">Jeu — Table de Pythagore (additions)</h3><a onClick={()=>go("/pytha")} className="btn mt-4 inline-block cursor-pointer">Découvrir</a></article>
+  </div>
+</main>);}
+
 function App(){
   const [route,setRoute]=useState(location.hash.replace(/^#/,"")||"/");
   const acc=useAccessibility();
-  useEffect(()=>{ const onHash=()=>setRoute(location.hash.replace(/^#/,"")||"/"); window.addEventListener("hashchange",onHash); return()=>window.removeEventListener("hashchange",onHash); },[]);
-  const go=k=>{ location.hash="#"+k; };
+  useEffect(()=>{const onHash=()=>setRoute(location.hash.replace(/^#/,"")||"/");window.addEventListener("hashchange",onHash);return()=>window.removeEventListener("hashchange",onHash);},[]);
+  const go=k=>{location.hash="#"+k;};
   return(<div className="min-h-screen p-6" style={{background:acc.rootBg,color:acc.rootText}}>
     <TopNav route={route} go={go}/>
     {route==="/" && <Hub go={go}/>}
@@ -343,3 +577,5 @@ ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
 </body>
 </html>
+
+
