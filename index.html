@@ -134,41 +134,44 @@ function Progress({remaining,total}){
   return <div className="progress-wrap mt-2"><div className="progress-bar" style={{width:`${pct}%`}}></div></div>;
 }
 
-function Recap({answers,onReplay,cardStyle}){
+    function Recap({answers,onReplay,cardStyle}){
   const total=answers.length, ok=answers.filter(a=>a.correct).length;
-  return (<div className="card rounded-2xl p-6" style={cardStyle}>
-    <h2 className="text-2xl font-bold mb-2">Résultats 🎯</h2>
-    <p className="mb-4">Tu as réussi <strong>{ok}/{total}</strong> questions.</p>
-    <div className="overflow-auto">
-      <table className="w-full border-collapse min-w-[800px]">
-        <thead><tr className="hdr">
-          <th className="border px-3 py-2 text-left">#</th>
-          <th className="border px-3 py-2 text-left">Question</th>
-          <th className="border px-3 py-2 text-left">Bonne réponse</th>
-          <th className="border px-3 py-2 text-left">Ta réponse</th>
-          <th className="border px-3 py-2 text-left">Statut</th>
-        </tr></thead>
-        <tbody>
-        {answers.map((a,i)=>(
-          <tr key={i} className={a.correct?"ok":"ko"}>
-            <td className="border px-3 py-2">{i+1}</td>
-            <td className="border px-3 py-2">{a.q}</td>
-            <td className="border px-3 py-2">{a.good}</td>
-            <td className="border px-3 py-2">{a.user==null?"—":String(a.user)}</td>
-            <td className="border px-3 py-2">{a.correct?"✅ Correct":"❌ Incorrect"}</td>
-          </tr>
-        ))}
-        </tbody>
-      </table>
-    </div>
-    <div className="flex gap-2 justify-center mt-6">
-      <button onClick={onReplay} className="px-5 py-3 rounded-2xl text-white font-semibold shadow" style={{backgroundColor:BRAND}}>Rejouer</button>
-      <a href="#/" className="px-5 py-3 rounded-2xl border">Retour au menu</a>
+  return (
+    <div className="card rounded-2xl p-6" style={cardStyle}>
+      <h2 className="text-2xl font-bold mb-2">Résultats 🎯</h2>
+      <p className="mb-4">Tu as réussi <strong>{ok}/{total}</strong> questions.</p>
+      <div className="overflow-auto">
+        <table className="w-full border-collapse min-w-[800px]">
+          <thead>
+            <tr className="hdr">
+              <th className="border px-3 py-2 text-left">#</th>
+              <th className="border px-3 py-2 text-left">Question</th>
+              <th className="border px-3 py-2 text-left">Bonne réponse</th>
+              <th className="border px-3 py-2 text-left">Ta réponse</th>
+              <th className="border px-3 py-2 text-left">Statut</th>
+            </tr>
+          </thead>
+          <tbody>
+            {answers.map((a,i)=>(
+              <tr key={i} className={a.correct?"ok":"ko"}>
+                <td className="border px-3 py-2">{i+1}</td>
+                <td className="border px-3 py-2">{a.q}</td>
+                <td className="border px-3 py-2">{a.good}</td>
+                <td className="border px-3 py-2">{a.user==null?"—":String(a.user)}</td>
+                <td className="border px-3 py-2">{a.correct?"✅ Correct":"❌ Incorrect"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="flex gap-2 justify-center mt-6">
+        <button onClick={onReplay} className="px-5 py-3 rounded-2xl text-white font-semibold shadow" style={{backgroundColor:BRAND}}>Rejouer</button>
+        <a href="#/" className="px-5 py-3 rounded-2xl border">Retour au menu</a>
       </div>
     </div>
-  </div>
-);
+  );
 }
+
     
 /* ------------------------ ADDITIONS ----------------------- */
   function GameAdd({acc}){
@@ -626,6 +629,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
 </body>
 </html>
+
 
 
 
