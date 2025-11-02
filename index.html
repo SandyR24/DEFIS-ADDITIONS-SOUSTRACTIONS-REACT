@@ -233,84 +233,49 @@ function GameAdd({acc}){
     <div className="min-h-screen p-6" style={{backgroundColor:acc.rootBg,color:acc.rootText}}>
       <div className="max-w-5xl mx-auto space-y-6">
         
-        {/* Écran de configuration */}
-        {!started && !finished && (
-          <div className="grid md:grid-cols-3 gap-4">
-            <AccessibilityCard acc={acc}/>
-            <div className="card rounded-2xl p-4" style={acc.cardStyle}>
-              <div className="font-bold mb-2">Mode</div>
-              <div className="grid gap-1">
-                <label><input type="radio" checked={mode==="niveau1"} onChange={()=>setMode("niveau1")}/> Niveau 1 — nombres &lt; 5</label>
-                <label><input type="radio" checked={mode==="niveau2"} onChange={()=>setMode("niveau2")}/> Niveau 2 — nombres ≤ 10</label>
-                <label><input type="radio" checked={mode==="niveau3"} onChange={()=>setMode("niveau3")}/> Niveau 3 — &lt; 50 (sans retenue)</label>
-                <label><input type="radio" checked={mode==="niveau4"} onChange={()=>setMode("niveau4")}/> Niveau 4 — additions des chefs (dizaines)</label>
-                <label><input type="radio" checked={mode==="niveau5"} onChange={()=>setMode("niveau5")}/> Niveau 5 — &lt; 100 sans retenue</label>
-                <label><input type="radio" checked={mode==="niveau6"} onChange={()=>setMode("niveau6")}/> Niveau 6 — &lt; 100 avec retenue</label>
-                <label><input type="radio" checked={mode==="decouverte"} onChange={()=>setMode("decouverte")}/> Découverte visuelle</label>
-                <label><input type="radio" checked={mode==="doubles"} onChange={()=>setMode("doubles")}/> Doubles</label>
-                <label><input type="radio" checked={mode==="moities"} onChange={()=>setMode("moities")}/> Moitiés</label>
-                <label><input type="radio" checked={mode==="trou"} onChange={()=>setMode("trou")}/> Additions à trou</label>
-                <label><input type="radio" checked={mode==="defis"} onChange={()=>setMode("defis")}/> Défis mélangés</label>
+        {/* Écran de jeu */}
+        {started && current && (
+          <div className="space-y-4">
+            <div className="card rounded-2xl p-3" style={acc.cardStyle}>
+              <div className="flex items-center justify-between">
+                <div><strong>Question :</strong> {idx+1}/{items.length}</div>
+                <div><strong>⏱ Temps :</strong> {timeLimit==null?"∞":`${Math.max(0,(timeLimit - tick))}s`}</div>
               </div>
-              <div className="font-bold mt-3 mb-1">Nombre de questions</div>
-              <div className="flex gap-2 flex-wrap">
-                {[5,10,15,20].map(n=>
-                  <button key={n} onClick={()=>setQuestionCount(n)} className={"pill "+(questionCount===n?"active":"")}>{n}</button>)}
+              <Progress remaining={timeLimit==null?0:Math.max(0,timeLimit - tick)} total={timeLimit}/>
+            </div>
+
+            {mode==="decouverte" && (
+              <div className="card rounded-2xl p-6 text-center" style={acc.cardStyle}>
+                <div className="mb-4 text-slate-700">Observe les bulles puis écris l’addition</div>
+                <div className="flex gap-8 justify-center items-center mb-4">
+                  <div className="flex gap-2 flex-wrap">{Array.from({length:current.a}).map((_,i)=>(<div key={i} className="h-6 w-6 rounded-full" style={{background:"#7ad1c9"}}/>))}</div>
+                  <div className="text-3xl font-bold">+</div>
+                  <div className="flex gap-2 flex-wrap">{Array.from({length:current.b}).map((_,i)=>(<div key={i} className="h-6 w-6 rounded-full" style={{background:"#ffd9b3"}}/>))}</div>
+                </div>
+                <form onSubmit={e=>{e.preventDefault();submit(false);}} className="flex gap-3 justify-center items-center">
+                  <input value={a} onChange={e=>setA(e.target.value.replace(/\D/g,""))} inputMode="numeric" className="w-20 text-center text-2xl px-3 py-2 rounded-2xl border violet-border fill-hint diag-txt"/>
+                  <span className="text-2xl font-bold">+</span>
+                  <input value={b} onChange={e=>setB(e.target.value.replace(/\D/g,""))} inputMode="numeric" className="w-20 text-center text-2xl px-3 py-2 rounded-2xl border violet-border fill-hint diag-txt"/>
+                  <span className="text-2xl font-bold">=</span>
+                  <input value={r} onChange={e=>setR(e.target.value.replace(/\D/g,""))} inputMode="numeric" className="w-20 text-center text-2xl px-3 py-2 rounded-2xl border violet-border fill-hint diag-txt"/>
+                  <button className="px-5 py-3 rounded-2xl text-white font-semibold shadow" style={{backgroundColor:BRAND}} type="submit">Valider</button>
+                </form>
               </div>
-              <div className="font-bold mt-3 mb-1">Temps par question</div>
-              <div className="flex gap-2 flex-wrap">
-                {[3,5,10].map(s=>
-                  <button key={s} onClick={()=>setTimeLimit(s)} className={"pill "+(timeLimit===s?"active":"")}>{s}s</button>)}
-                <button onClick={()=>setTimeLimit(null)} className={"pill "+(timeLimit==null?"active":"")}>Pas de chrono</button>
+            )}
+
+            {mode==="trou" && (
+              <div className="card rounded-2xl p-6 text-center" style={acc.cardStyle}>
+                <div className="text-4xl font-black mb-4">
+                  {current.layout==="a+_=r" && <>{current.a} + ? = {current.r}</>}
+                  {current.layout==="_=b=r" && <>? + {current.b} = {current.r}</>}
+                  {current.layout==="r=a+_" && <>{current.r} = {current.a} + ?</>}
+                </div>
+                <form onSubmit={e=>{e.preventDefault();submit(false);}} className="flex gap-3 justify-center items-center">
+                  <input value={one} onChange={e=>setOne(e.target.value.replace(/\D/g,""))} inputMode="numeric" className="w-28 text-center text-3xl px-4 py-3 rounded-2xl border violet-border fill-hint diag-txt"/>
+                  <button className="px-5 py-3 rounded-2xl text-white font-semibold shadow" style={{backgroundColor:BRAND}} type="submit">Valider</button>
+                </form>
               </div>
-            </div>
-            <div className="card rounded-2xl p-4" style={acc.cardStyle}>
-              <div className="font-bold mb-2">Action</div>
-              <button onClick={init} className="px-4 py-2 rounded-2xl text-white" style={{backgroundColor:BRAND}}>Commencer</button>
-            </div>
-          </div>
-        )}
-
-    {started && current && (
-      <div className="space-y-4">
-        <div className="card rounded-2xl p-3" style={acc.cardStyle}>
-          <div className="flex items-center justify-between">
-            <div><strong>Question :</strong> {idx+1}/{items.length}</div>
-            <div><strong>⏱ Temps :</strong> {timeLimit==null?"∞":`${Math.max(0,(timeLimit - tick))}s`}</div>
-          </div>
-          <Progress remaining={timeLimit==null?0:Math.max(0,timeLimit - tick)} total={timeLimit}/>
-        </div>
-
-        {mode==="decouverte" && (
-          <div className="card rounded-2xl p-6 text-center" style={acc.cardStyle}>
-            <div className="mb-4 text-slate-700">Observe les bulles puis écris l’addition</div>
-            <div className="flex gap-8 justify-center items-center mb-4">
-              <div className="flex gap-2 flex-wrap">{Array.from({length:current.a}).map((_,i)=>(<div key={i} className="h-6 w-6 rounded-full" style={{background:"#7ad1c9"}}/>))}</div>
-              <div className="text-3xl font-bold">+</div>
-              <div className="flex gap-2 flex-wrap">{Array.from({length:current.b}).map((_,i)=>(<div key={i} className="h-6 w-6 rounded-full" style={{background:"#ffd9b3"}}/>))}</div>
-            </div>
-            <form onSubmit={e=>{e.preventDefault();submit(false);}} className="flex gap-3 justify-center items-center">
-              <input value={a} onChange={e=>setA(e.target.value.replace(/\D/g,""))} inputMode="numeric" className="w-20 text-center text-2xl px-3 py-2 rounded-2xl border violet-border fill-hint diag-txt"/>
-              <span className="text-2xl font-bold">+</span>
-              <input value={b} onChange={e=>setB(e.target.value.replace(/\D/g,""))} inputMode="numeric" className="w-20 text-center text-2xl px-3 py-2 rounded-2xl border violet-border fill-hint diag-txt"/>
-              <span className="text-2xl font-bold">=</span>
-              <input value={r} onChange={e=>setR(e.target.value.replace(/\D/g,""))} inputMode="numeric" className="w-20 text-center text-2xl px-3 py-2 rounded-2xl border violet-border fill-hint diag-txt"/>
-              <button className="px-5 py-3 rounded-2xl text-white font-semibold shadow" style={{backgroundColor:BRAND}} type="submit">Valider</button>
-            </form>
-          </div>
-        )}
-
-        {mode==="trou" && (
-          <div className="card rounded-2xl p-6 text-center" style={acc.cardStyle}>
-            <div className="text-4xl font-black mb-4">
-              {current.layout==="a+_=r" && <>{current.a} + ? = {current.r}</>}
-              {current.layout==="_=b=r" && <>? + {current.b} = {current.r}</>}
-              {current.layout==="r=a+_" && <>{current.r} = {current.a} + ?</>}
-            </div>
-            <form onSubmit={e=>{e.preventDefault();submit(false);}} className="flex gap-3 justify-center items-center">
-              <input value={one} onChange={e=>setOne(e.target.value.replace(/\D/g,""))} inputMode="numeric" className="w-28 text-center text-3xl px-4 py-3 rounded-2xl border violet-border fill-hint diag-txt"/>
-              <button className="px-5 py-3 rounded-2xl text-white font-semibold shadow" style={{backgroundColor:BRAND}} type="submit">Valider</button>
-            </form>
+            )}
           </div>
         )}
 
@@ -620,6 +585,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
 </body>
 </html>
+
 
 
 
