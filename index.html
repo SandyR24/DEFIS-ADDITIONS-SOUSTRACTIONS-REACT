@@ -53,7 +53,6 @@ body{ margin:0; background:#f8fafc; color:#111; font-family:system-ui,-apple-sys
 </head>
 <body>
 <div id="root"></div>
-
 <script type="text/babel" data-presets="env,react">
 const {useState,useEffect,useRef,useMemo}=React;
 const BRAND="#8374a7"; 
@@ -250,8 +249,7 @@ function GameAdd({acc}){
             <label><input type="radio" checked={mode==="trou"} onChange={()=>setMode("trou")}/> Additions à trou</label>
             <label><input type="radio" checked={mode==="defis"} onChange={()=>setMode("defis")}/> Défis mélangés</label>
           </div>
-
-                  <div className="font-bold mt-3 mb-1">Nombre de questions</div>
+        <div className="font-bold mt-3 mb-1">Nombre de questions</div>
         <div className="flex gap-2 flex-wrap">
           {[5,10,15,20].map(n=>
             <button key={n} onClick={()=>setQuestionCount(n)} className={"pill "+(questionCount===n?"active":"")}>{n}</button>)}
@@ -312,11 +310,30 @@ function GameAdd({acc}){
           </div>
         )}
 
-        {finished && <Recap answers={answers} cardStyle={acc.cardStyle} onReplay={()=>{setStarted(false);setFinished(false);setAnswers([]);setIdx(0);setItems([]);setTick(0);}}/>}
+      {finished && (
+        <Recap
+          answers={answers}
+          cardStyle={acc.cardStyle}
+          onReplay={() => {
+            setStarted(false);
+            setFinished(false);
+            setAnswers([]);
+            setIdx(0);
+            setItems([]);
+            setTick(0);
+          }}
+        />
+      )}
+      <div className="mt-6">
+        <a href="#/" className="px-4 py-2 rounded-2xl border">
+          Retour au menu
+        </a>
       </div>
-    )}
-  </div>);
+    </div>
+  </div>
+);
 }
+
 
 /* ----------------------- SOUSTRACTIONS --------------------- */
 function GameSub({acc}){
@@ -573,9 +590,12 @@ function App(){
     {route==="/pytha" && <GamePythaAdd acc={acc}/>}
   </div>);
 }
+
 ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
 </body>
 </html>
+
+
 
 
