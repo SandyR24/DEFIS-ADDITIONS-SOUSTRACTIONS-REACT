@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Défis Additions & Soustractions — Sacado</title>
+
+<!-- Police + Styles intégrés (violet Sacado, mêmes cartes/boutons que ton jeu) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--violet:#5b4bc4;--violet-dark:#3a2f8a;--yellow:#ffd35a}
+*{box-sizing:border-box}html,body{height:100%}
+body{margin:0;background:radial-gradient(1000px 700px at 40% 20%, #6b5fe0 0%, var(--violet) 35%, var(--violet-dark) 100%);
+font-family:'Nunito',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;}
+.header{display:flex;align-items:center;gap:10px;justify-content:center;padding:10px 16px}
+.header .logo{height:48px;width:48px;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,.25)}
+.title{color:#fff;font-weight:900;font-size:clamp(26px,4.8vw,44px);text-align:center;text-shadow:0 2px 8px rgba(0,0,0,.25)}
+.wrapper{max-width:1100px;margin:0 auto;padding:18px}
+.toolbar{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}
+.btn{border:none;border-radius:14px;padding:10px 14px;font-weight:800;cursor:pointer;box-shadow:0 8px 16px rgba(0,0,0,.15);background:#4da3ff;color:#fff}
+.btn.green{background:#1fd1b7}.btn.yellow{background:var(--yellow);color:#4a3b00}
+.card{background:rgba(255,255,255,.92);border-radius:18px;padding:16px;margin:10px 0;box-shadow:0 14px 30px rgba(0,0,0,.18);backdrop-filter:blur(6px)}
+h2{color:var(--yellow);margin:0 0 10px 0;font-size:22px}
+.math{font-size:clamp(36px,6vw,64px);font-weight:900;text-align:center;margin:8px 0}
+.math .a{color:#1e8a2d}.math .b{color:#cc2222}.math .r{color:#1d3fff}
+.controls{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:6px}
+select,input[type=text]{border:1px solid #e6e6e6;border-radius:12px;padding:8px 10px;font-size:18px;text-align:center;min-width:86px}
+input.answer{min-width:110px}
+.badge{background:#fff;border:2px solid #e7e7e7;border-radius:999px;padding:5px 10px;font-weight:800}
+.line{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0}
+.apple{position:relative;width:48px;height:48px;border:2px solid #5bb0ff;border-radius:8px;background:#e9f4ff;display:flex;align-items:center;justify-content:center}
+.apple svg{width:40px;height:40px}
+.apple.cross::after{content:'';position:absolute;left:6px;right:6px;top:50%;height:0;border-top:4px solid #e74c3c;transform:rotate(-35deg)}
+.appleBox{display:flex;flex-wrap:wrap;gap:6px;border:2px solid #5bb0ff;padding:6px;border-radius:10px;background:rgba(90,170,255,.08)}
+.numberline{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+.square{width:48px;height:48px;border:3px solid #1936a3;display:flex;align-items:center;justify-content:center;background:#d7e9ff;color:#000;font-size:26px;font-weight:900;border-radius:6px}
+.square.green{background:#8ef78e}.square.blue{background:#9fc7ff}
+.hidden{display:none}.small{color:#fff;opacity:.9;text-align:center}
+.row{display:flex;justify-content:center;gap:12px;align-items:center}
+</style>
+</head>
+
+<body>
+<div class="wrapper">
+  <div class="header"><img src="sacadoLogo.png" class="logo" alt="Sacado"/><img src="dogbot.png" class="logo" alt="Dogbot"/></div>
+  <div class="title">Défis Additions & Soustractions</div>
+
+  <!-- NAVIGATION identique à ton jeu -->
+  <div class="toolbar">
+    <button class="btn" onclick="show('addSimple')">Additions simples</button>
+    <button class="btn" onclick="show('addTrou')">Addition à trou ❓</button>
+    <button class="btn" onclick="show('doubles')">Doubles</button>
+    <button class="btn" onclick="show('moities')">Moitiés</button>
+    <button class="btn green" onclick="show('subSimple')">Soustractions visuelles</button>
+    <button class="btn green" onclick="show('subTrou')">Soustractions à trou ❓</button>
+  </div>
+
+  <!-- ADDITIONS SIMPLES -->
+  <section id="addSimple" class="card">
+    <h2>Additions simples</h2>
+    <div class="controls">
+      <span class="badge">Niveau</span>
+      <select id="lvlAddSimple"><option value="1">1 (nombres &lt; 5)</option><option value="2" selected>2 (≤ 10)</option></select>
+      <span class="badge">Questions</span>
+      <select id="qAddSimple"><option>5</option><option selected>10</option><option>15</option></select>
+      <button class="btn yellow" id="startAddSimple">Démarrer</button>
+      <span class="badge" id="scoreAddSimple">0 / 0</span>
+    </div>
+    <div class="math"><span class="a" id="asA">3</span> + <span class="b" id="asB">4</span> = <input class="answer" id="asAns" type="text" inputmode="numeric" /></div>
+    <div class="controls"><button class="btn green" id="asVal">Valider</button></div>
+  </section>
+
+  <!-- ADDITION À TROU (❓ à la place de la case) -->
+  <section id="addTrou" class="card hidden">
+    <h2>Additions à trou (❓)</h2>
+    <div class="controls">
+      <span class="badge">Niveau</span>
+      <select id="lvlAddHole"><option value="1">1 (nombres &lt; 5)</option><option value="2" selected>2 (≤ 10)</option></select>
+      <span class="badge">Questions</span>
+      <select id="qAddHole"><option>5</option><option selected>10</option><option>15</option></select>
+      <button class="btn yellow" id="startAddHole">Démarrer</button>
+      <span class="badge" id="scoreAddHole">0 / 0</span>
+    </div>
+    <div class="math"><span class="a" id="ahLeft">?</span> + <span class="b" id="ahRight">4</span> = <span class="r" id="ahRes">7</span></div>
+    <div class="controls row"><input class="answer" id="ahAns" type="text" inputmode="numeric" placeholder="?" /><button class="btn green" id="ahVal">Valider</button></div>
+  </section>
+
+  <!-- DOUBLES -->
+  <section id="doubles" class="card hidden">
+    <h2>Doubles aléatoires</h2>
+    <div class="controls"><button class="btn yellow" id="startDbl">Nouveau</button><span class="badge" id="scoreDbl">0 / 0</span></div>
+    <div class="math"><span class="a" id="dblN">6</span> + <span class="a">6</span> = <span class="r">?</span></div>
+    <div class="row"><input class="answer" id="dblAns" type="text" inputmode="numeric" placeholder="?" /><button class="btn green" id="dblVal">Valider</button></div>
+  </section>
+
+  <!-- MOITIÉS -->
+  <section id="moities" class="card hidden">
+    <h2>Moitiés</h2>
+    <div class="controls"><button class="btn yellow" id="startHalf">Nouveau</button><span class="badge" id="scoreHalf">0 / 0</span></div>
+    <div class="math"><span class="a" id="halfN">14</span> ÷ 2 = <span class="r">?</span></div>
+    <div class="row"><input class="answer" id="halfAns" type="text" inputmode="numeric" placeholder="?" /><button class="btn green" id="halfVal">Valider</button></div>
+  </section>
+
+  <!-- SOUSTRACTION VISUELLE (pommes barrées) -->
+  <section id="subSimple" class="card hidden">
+    <h2>Soustractions visuelles (pommes barrées)</h2>
+    <div class="controls">
+      <span class="badge">Niveau</span>
+      <select id="lvlSubSimple"><option value="1" selected>1 (≤ 5)</option><option value="2">2 (≤ 10)</option></select>
+      <span class="badge">Questions</span>
+      <select id="qSubSimple"><option>5</option><option selected>10</option><option>15</option></select>
+      <button class="btn yellow" id="startSubSimple">Démarrer</button>
+      <span class="badge" id="scoreSubSimple">0 / 0</span>
+    </div>
+    <div class="math"><span class="a" id="ssA">9</span> − <span class="b" id="ssB">4</span> = <span class="r" id="ssR">?</span></div>
+    <div class="line"><div id="ssApples" class="appleBox"></div></div>
+    <div class="numberline" id="ssLine"></div>
+    <div class="controls"><button class="btn green" id="ssShow">Réponse</button></div>
+  </section>
+
+  <!-- SOUSTRACTION À TROU -->
+  <section id="subTrou" class="card hidden">
+    <h2>Soustractions à trou</h2>
+    <div class="controls">
+      <span class="badge">Niveau</span>
+      <select id="lvlSubHole"><option value="1">1 (≤ 5)</option><option value="2" selected>2 (≤ 10)</option></select>
+      <span class="badge">Questions</span>
+      <select id="qSubHole"><option>5</option><option selected>10</option><option>15</option></select>
+      <button class="btn yellow" id="startSubHole">Démarrer</button>
+      <span class="badge" id="scoreSubHole">0 / 0</span>
+    </div>
+    <div class="math"><span class="a" id="shA">9</span> − <span class="b" id="shB">4</span> = <input class="answer" id="shAns" type="text" inputmode="numeric" placeholder="?" /></div>
+    <div class="controls"><button class="btn green" id="shVal">Valider</button></div>
+  </section>
+
+  <div class="small">Astuce : ❓ remplace la case à compléter. Les pommes barrées montrent la soustraction.</div>
+</div>
+
+<script>
+function show(id){document.querySelectorAll('.card').forEach(s=>s.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');}
+function rint(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
+// Pomme inline (pas besoin d'image externe)
+function appleSVG(){return '<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path fill="#9acd32" d="M42 26c-6 0-9 5-10 5s-4-5-10-5c-7 0-12 6-12 13 0 12 10 19 22 19s22-7 22-19c0-7-5-13-12-13z"/><path fill="#7caf00" d="M40 22c-3 0-6 2-8 4-2-2-5-4-8-4-1 0-2 0-3 .3 3-3 7-5 11-5s8 2 11 5c-1-.3-2-.3-3-.3z"/><path fill="#5b8a00" d="M34 13c1 3 1 5 1 5h-4s0-2 1-5c1-3 5-5 5-5s-2 3-3 5z"/></svg>';}
+
+/* -------- Additions simples -------- */
+const lvlAddSimple=document.getElementById('lvlAddSimple'), qAddSimple=document.getElementById('qAddSimple'), startAddSimple=document.getElementById('startAddSimple');
+const asA=document.getElementById('asA'), asB=document.getElementById('asB'), asAns=document.getElementById('asAns'), asVal=document.getElementById('asVal'), scoreAddSimple=document.getElementById('scoreAddSimple');
+let asScore=0, asDone=0, asTarget=10;
+function nextAddSimple(){const max=(lvlAddSimple.value==='1')?4:10; const a=rint(0,max); const b=rint(0,max-a); asA.textContent=a; asB.textContent=b; asAns.value='';}
+asVal.addEventListener('click',()=>{const r=Number(asA.textContent)+Number(asB.textContent); if(Number(asAns.value)===r) asScore++; asDone++; scoreAddSimple.textContent=asScore+' / '+asDone; if(asDone>=asTarget){alert('Série terminée'); asDone=0; asScore=0;} nextAddSimple();});
+startAddSimple.addEventListener('click',()=>{asTarget=Number(qAddSimple.value); asScore=0; asDone=0; scoreAddSimple.textContent='0 / 0'; nextAddSimple();});
+
+/* -------- Addition à trou (❓) -------- */
+const lvlAddHole=document.getElementById('lvlAddHole'), qAddHole=document.getElementById('qAddHole'), startAddHole=document.getElementById('startAddHole');
+const ahLeft=document.getElementById('ahLeft'), ahRight=document.getElementById('ahRight'), ahRes=document.getElementById('ahRes'), ahAns=document.getElementById('ahAns'), ahVal=document.getElementById('ahVal'), scoreAddHole=document.getElementById('scoreAddHole');
+let ahScore=0, ahDone=0, ahTarget=10, ahCorrect=0;
+function nextAddHole(){const max=(lvlAddHole.value==='1')?4:10; const a=rint(0,max); const b=rint(0,max-a); ahLeft.textContent='?'; ahRight.textContent=b; ahRes.textContent=a+b; ahCorrect=a; ahAns.value='';}
+ahVal.addEventListener('click',()=>{if(Number(ahAns.value)===ahCorrect) ahScore++; ahDone++; scoreAddHole.textContent=ahScore+' / '+ahDone; if(ahDone>=ahTarget){alert('Série terminée'); ahDone=0; ahScore=0;} nextAddHole();});
+startAddHole.addEventListener('click',()=>{ahTarget=Number(qAddHole.value); ahScore=0; ahDone=0; scoreAddHole.textContent='0 / 0'; nextAddHole();});
+
+/* -------- Doubles -------- */
+const dblN=document.getElementById('dblN'), dblAns=document.getElementById('dblAns'), dblVal=document.getElementById('dblVal'), startDbl=document.getElementById('startDbl'), scoreDbl=document.getElementById('scoreDbl');
+let dblScore=0, dblDone=0; function nextDbl(){const n=rint(0,10); dblN.textContent=n; dblAns.value='';}
+dblVal.addEventListener('click',()=>{const n=Number(dblN.textContent); if(Number(dblAns.value)===n*2) dblScore++; dblDone++; scoreDbl.textContent=dblScore+' / '+dblDone; nextDbl();});
+startDbl.addEventListener('click',()=>{dblScore=0; dblDone=0; scoreDbl.textContent='0 / 0'; nextDbl();});
+
+/* -------- Moitiés -------- */
+const halfN=document.getElementById('halfN'), halfAns=document.getElementById('halfAns'), halfVal=document.getElementById('halfVal'), startHalf=document.getElementById('startHalf'), scoreHalf=document.getElementById('scoreHalf');
+let halfScore=0, halfDone=0; function nextHalf(){const ev=[0,2,4,6,8,10,12,14,16,18,20]; const v=ev[rint(0,ev.length-1)]; halfN.textContent=v; halfAns.value='';}
+halfVal.addEventListener('click',()=>{const v=Number(halfN.textContent); if(Number(halfAns.value)===v/2) halfScore++; halfDone++; scoreHalf.textContent=halfScore+' / '+halfDone; nextHalf();});
+startHalf.addEventListener('click',()=>{halfScore=0; halfDone=0; scoreHalf.textContent='0 / 0'; nextHalf();});
+
+/* -------- Soustraction visuelle (pommes barrées) -------- */
+const lvlSubSimple=document.getElementById('lvlSubSimple'), qSubSimple=document.getElementById('qSubSimple'), startSubSimple=document.getElementById('startSubSimple');
+const ssA=document.getElementById('ssA'), ssB=document.getElementById('ssB'), ssR=document.getElementById('ssR'), ssApples=document.getElementById('ssApples'), ssLine=document.getElementById('ssLine'), ssShow=document.getElementById('ssShow'), scoreSubSimple=document.getElementById('scoreSubSimple');
+let ssScore=0, ssDone=0, ssTarget=10, ssCorrect=0;
+function renderApples(a,b){ssApples.innerHTML=''; for(let i=0;i<a;i++){const box=document.createElement('div'); box.className='apple'; box.innerHTML=appleSVG(); if(i<b) box.classList.add('cross'); ssApples.appendChild(box);} ssLine.innerHTML=''; for(let i=1;i<=Math.max(10,a);i++){const sq=document.createElement('div'); sq.className='square'+(i===a?' green':''); if(i>=(a-b+1) && i<=a) sq.classList.add('blue'); sq.textContent=String(i); ssLine.appendChild(sq);}}
+function nextSubSimple(){const max=(lvlSubSimple.value==='1')?5:10; const a=rint(0,max); const b=rint(0,a); ssA.textContent=a; ssB.textContent=b; ssR.textContent='?'; ssCorrect=a-b; renderApples(a,b);}
+ssShow.addEventListener('click',()=>{ssR.textContent=ssCorrect; ssScore++; ssDone++; scoreSubSimple.textContent=ssScore+' / '+ssDone; if(ssDone>=ssTarget){alert('Série terminée'); ssDone=0; ssScore=0;} nextSubSimple();});
+startSubSimple.addEventListener('click',()=>{ssTarget=Number(qSubSimple.value); ssScore=0; ssDone=0; scoreSubSimple.textContent='0 / 0'; nextSubSimple();});
+
+/* -------- Soustraction à trou -------- */
+const lvlSubHole=document.getElementById('lvlSubHole'), qSubHole=document.getElementById('qSubHole'), startSubHole=document.getElementById('startSubHole');
+const shA=document.getElementById('shA'), shB=document.getElementById('shB'), shAns=document.getElementById('shAns'), shVal=document.getElementById('shVal'), scoreSubHole=document.getElementById('scoreSubHole');
+let shScore=0, shDone=0, shTarget=10, shCorrect=0;
+function nextSubHole(){const max=(lvlSubHole.value==='1')?5:10; const a=rint(0,max); const b=rint(0,a); shA.textContent=a; shB.textContent=b; shCorrect=a-b; shAns.value='';}
+shVal.addEventListener('click',()=>{if(Number(shAns.value)===shCorrect) shScore++; shDone++; scoreSubHole.textContent=shScore+' / '+shDone; if(shDone>=shTarget){alert('Série terminée'); shDone=0; shScore=0;} nextSubHole();});
+startSubHole.addEventListener('click',()=>{shTarget=Number(qSubHole.value); shScore=0; shDone=0; scoreSubHole.textContent='0 / 0'; nextSubHole();});
+
+/* Écran par défaut */
+show('addSimple');
+</script>
+</body>
+</html>
