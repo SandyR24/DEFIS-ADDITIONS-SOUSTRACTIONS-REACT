@@ -53,7 +53,7 @@ body{ margin:0; background:#f8fafc; color:#111; font-family:system-ui,-apple-sys
 </head>
 <body>
 <div id="root"></div>
-<script type="text/babel" data-presets="env,react">
+  <script type="text/babel" data-type="module" data-presets="react,env">
 const {useState,useEffect,useRef,useMemo}=React;
 const BRAND="#8374a7"; 
 const range=(a,b)=>Array.from({length:b-a+1},(_,i)=>a+i);
@@ -328,10 +328,9 @@ function GameAdd({acc}){
         <a href="#/" className="px-4 py-2 rounded-2xl border">
           Retour au menu
         </a>
-      </div>
+        </div>
     </div>
-  </div>
-);
+  );
 }
 
 /* ----------------------- SOUSTRACTIONS --------------------- */
@@ -579,7 +578,11 @@ function Hub({go}){return(<main className="max-w-5xl mx-auto px-4 py-8">
 function App(){
   const [route,setRoute]=useState(location.hash.replace(/^#/,"")||"/");
   const acc=useAccessibility();
-  useEffect(()=>{const onHash=()=>setRoute(location.hash.replace(/^#/,"")||"/");window.addEventListener("hashchange",onHash);return()=>window.removeEventListener("hashchange",onHash);},[]);
+  useEffect(()=>{
+    const onHash=()=>setRoute(location.hash.replace(/^#/,"")||"/");
+    window.addEventListener("hashchange",onHash);
+    return ()=>window.removeEventListener("hashchange",onHash);
+  },[]);
   const go=k=>{location.hash="#"+k;};
   return(<div className="min-h-screen p-6" style={{background:acc.rootBg,color:acc.rootText}}>
     <TopNav route={route} go={go}/>
@@ -594,6 +597,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
 </body>
 </html>
+
 
 
 
