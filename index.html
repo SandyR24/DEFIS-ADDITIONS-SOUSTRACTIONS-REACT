@@ -1,196 +1,345 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Défis Additions & Soustractions — Sacado</title>
-
-<!-- Police + Styles intégrés (violet Sacado, mêmes cartes/boutons que ton jeu) -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta http-equiv="Cache-Control" content="no-store"/>
+<title>Sacado Académie — Additions & Soustractions</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
 <style>
-:root{--violet:#5b4bc4;--violet-dark:#3a2f8a;--yellow:#ffd35a}
-*{box-sizing:border-box}html,body{height:100%}
-body{margin:0;background:radial-gradient(1000px 700px at 40% 20%, #6b5fe0 0%, var(--violet) 35%, var(--violet-dark) 100%);
-font-family:'Nunito',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;}
-.header{display:flex;align-items:center;gap:10px;justify-content:center;padding:10px 16px}
-.header .logo{height:48px;width:48px;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,.25)}
-.title{color:#fff;font-weight:900;font-size:clamp(26px,4.8vw,44px);text-align:center;text-shadow:0 2px 8px rgba(0,0,0,.25)}
-.wrapper{max-width:1100px;margin:0 auto;padding:18px}
-.toolbar{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}
-.btn{border:none;border-radius:14px;padding:10px 14px;font-weight:800;cursor:pointer;box-shadow:0 8px 16px rgba(0,0,0,.15);background:#4da3ff;color:#fff}
-.btn.green{background:#1fd1b7}.btn.yellow{background:var(--yellow);color:#4a3b00}
-.card{background:rgba(255,255,255,.92);border-radius:18px;padding:16px;margin:10px 0;box-shadow:0 14px 30px rgba(0,0,0,.18);backdrop-filter:blur(6px)}
-h2{color:var(--yellow);margin:0 0 10px 0;font-size:22px}
-.math{font-size:clamp(36px,6vw,64px);font-weight:900;text-align:center;margin:8px 0}
-.math .a{color:#1e8a2d}.math .b{color:#cc2222}.math .r{color:#1d3fff}
-.controls{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:6px}
-select,input[type=text]{border:1px solid #e6e6e6;border-radius:12px;padding:8px 10px;font-size:18px;text-align:center;min-width:86px}
-input.answer{min-width:110px}
-.badge{background:#fff;border:2px solid #e7e7e7;border-radius:999px;padding:5px 10px;font-weight:800}
-.line{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0}
-.apple{position:relative;width:48px;height:48px;border:2px solid #5bb0ff;border-radius:8px;background:#e9f4ff;display:flex;align-items:center;justify-content:center}
-.apple svg{width:40px;height:40px}
-.apple.cross::after{content:'';position:absolute;left:6px;right:6px;top:50%;height:0;border-top:4px solid #e74c3c;transform:rotate(-35deg)}
-.appleBox{display:flex;flex-wrap:wrap;gap:6px;border:2px solid #5bb0ff;padding:6px;border-radius:10px;background:rgba(90,170,255,.08)}
-.numberline{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:8px}
-.square{width:48px;height:48px;border:3px solid #1936a3;display:flex;align-items:center;justify-content:center;background:#d7e9ff;color:#000;font-size:26px;font-weight:900;border-radius:6px}
-.square.green{background:#8ef78e}.square.blue{background:#9fc7ff}
-.hidden{display:none}.small{color:#fff;opacity:.9;text-align:center}
-.row{display:flex;justify-content:center;gap:12px;align-items:center}
+:root{ --brand:#8374a7; }
+body{ margin:0; background:#f8fafc; color:#111; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
+.card{ background:#fff; border:1px solid #e5e7eb; border-radius:16px; }
+.btn{ background:var(--brand); color:#fff; border-radius:16px; padding:.6rem 1rem; }
+.pill{ padding:.45rem .8rem; border:1px solid #e5e7eb; border-radius:999px; background:#fff; cursor:pointer; color:#111827; }
+.pill.active{ background:var(--brand); border-color:var(--brand); color:#fff; }
+.hdr{ background:#f1f5f9; }
+.ok{ background:#dcfce7 !important; }
+.ko{ background:#fee2e2 !important; }
+.diag-bg{ background:rgba(131,116,167,.16) !important; }
+.diag-txt{ color:#8374a7 !important; font-weight:700; }
+.fill-hint{ background:rgba(131,116,167,.12) !important; }
+.violet-border{ border-color:#8374a7 !important; box-shadow:0 0 0 2px rgba(131,116,167,.25) inset; }
+.progress-wrap{ height:10px; background:#e5e7eb; border-radius:9999px; overflow:hidden; }
+.progress-bar{ height:100%; background:#8374a7; transition:width .25s linear; }
+.dark-mode{ background:#000 !important; color:#f8fafc !important; }
+.dark-mode .card{ background:#111 !important; border-color:#333 !important; }
+.dark-mode .hdr{ background:#1f2937 !important; color:#f8fafc !important; }
+.dark-mode input, .dark-mode select{ background:#000 !important; color:#f8fafc !important; border-color:#555 !important; }
+.dark-mode .pill{ background:#fff !important; color:#111 !important; }
+.dark-mode .pill.active{ background:#a69acc !important; border-color:#a69acc !important; color:#111 !important; }
+.dark-mode .progress-bar{ background:#a69acc !important; }
+.bot-bubble{ display:flex; gap:.75rem; align-items:flex-start; border:1px solid #e5e7eb; border-radius:16px; padding:10px 12px; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,.05); }
+.bot-bubble.ok{ border-color:#22c55e; }
+.bot-bubble.ko{ border-color:#ef4444; }
+.bot-bubble img{ width:32px; height:32px; object-fit:contain; }
+.ok input { background:#dcfce7 !important; border:2px solid #16a34a !important; color:#065f46 !important; font-weight:700; }
+.ko input { background:#fee2e2 !important; border:2px solid #ef4444 !important; color:#991b1b !important; font-weight:700; }
+.table-cell { min-width:80px; }
 </style>
 </head>
-
 <body>
-<div class="wrapper">
-  <div class="header"><img src="sacadoLogo.png" class="logo" alt="Sacado"/><img src="dogbot.png" class="logo" alt="Dogbot"/></div>
-  <div class="title">Défis Additions & Soustractions</div>
-
-  <!-- NAVIGATION identique à ton jeu -->
-  <div class="toolbar">
-    <button class="btn" onclick="show('addSimple')">Additions simples</button>
-    <button class="btn" onclick="show('addTrou')">Addition à trou ❓</button>
-    <button class="btn" onclick="show('doubles')">Doubles</button>
-    <button class="btn" onclick="show('moities')">Moitiés</button>
-    <button class="btn green" onclick="show('subSimple')">Soustractions visuelles</button>
-    <button class="btn green" onclick="show('subTrou')">Soustractions à trou ❓</button>
-  </div>
-
-  <!-- ADDITIONS SIMPLES -->
-  <section id="addSimple" class="card">
-    <h2>Additions simples</h2>
-    <div class="controls">
-      <span class="badge">Niveau</span>
-      <select id="lvlAddSimple"><option value="1">1 (nombres &lt; 5)</option><option value="2" selected>2 (≤ 10)</option></select>
-      <span class="badge">Questions</span>
-      <select id="qAddSimple"><option>5</option><option selected>10</option><option>15</option></select>
-      <button class="btn yellow" id="startAddSimple">Démarrer</button>
-      <span class="badge" id="scoreAddSimple">0 / 0</span>
+<div id="root"></div>
+<script type="text/babel" data-presets="env,react">
+const {useState,useEffect,useRef,useMemo}=React;
+const BRAND="#8374a7"; const range=(a,b)=>Array.from({length:b-a+1},(_,i)=>a+i);
+function useAccessibility(){
+  const [font,setFont]=useState("Arial"); const [size,setSize]=useState(18);
+  const [yellow,setYellow]=useState(false); const [black,setBlack]=useState(false);
+  const [audio,setAudio]=useState(false);
+  useEffect(()=>{ const FAMILY=font==="Comic"?"'Comic Sans MS','Comic Sans',cursive":font==="Verdana"?"Verdana, Geneva, Tahoma, sans-serif":font==="OpenDyslexicLocal"?"OpenDyslexicLocal":"Arial, Helvetica, sans-serif"; document.body.style.fontFamily=FAMILY; document.body.style.fontSize=`${size}px`; },[font,size]);
+  const rootBg=black?"#000":yellow?"#fff7cc":"#f8fafc"; const rootText=black?"#f8fafc":"#111"; const cardStyle={backgroundColor:yellow?"#fff7cc":black?"#111":"#fff",color:rootText};
+  const speak=txt=>{ try{ if(!audio) return; const u=new SpeechSynthesisUtterance(txt); u.lang="fr-FR"; speechSynthesis.cancel(); speechSynthesis.speak(u);}catch(e){} };
+  return{font,setFont,size,setSize,yellow,black,audio,setAudio,setYellow:setYellow,setBlack:setBlack,rootBg,rootText,cardStyle,speak};
+}
+function AccessibilityCard({acc}){
+  const light=acc.black?{background:'#f8fafc',color:'#111',borderColor:'#cbd5e1'}:{};
+  return(<div className="card rounded-2xl p-4" style={acc.cardStyle}>
+    <div className="font-bold mb-2">Accessibilité</div>
+    <div className="flex gap-2 flex-wrap mb-2">
+      <select value={acc.font} onChange={e=>acc.setFont(e.target.value)} className="border rounded p-1" style={light}>
+        <option value="Arial">Arial</option><option value="Verdana">Verdana</option><option value="Comic">Comic Sans</option><option value="OpenDyslexicLocal">OpenDyslexic</option>
+      </select>
+      <select value={acc.size} onChange={e=>acc.setSize(parseInt(e.target.value))} className="border rounded p-1" style={light}>
+        {[16,18,20,22,24,26,28,30,32].map(s=><option key={s} value={s}>{s}px</option>)}
+      </select>
     </div>
-    <div class="math"><span class="a" id="asA">3</span> + <span class="b" id="asB">4</span> = <input class="answer" id="asAns" type="text" inputmode="numeric" /></div>
-    <div class="controls"><button class="btn green" id="asVal">Valider</button></div>
-  </section>
-
-  <!-- ADDITION À TROU (❓ à la place de la case) -->
-  <section id="addTrou" class="card hidden">
-    <h2>Additions à trou (❓)</h2>
-    <div class="controls">
-      <span class="badge">Niveau</span>
-      <select id="lvlAddHole"><option value="1">1 (nombres &lt; 5)</option><option value="2" selected>2 (≤ 10)</option></select>
-      <span class="badge">Questions</span>
-      <select id="qAddHole"><option>5</option><option selected>10</option><option>15</option></select>
-      <button class="btn yellow" id="startAddHole">Démarrer</button>
-      <span class="badge" id="scoreAddHole">0 / 0</span>
+    <label className="block"><input type="checkbox" checked={acc.yellow} onChange={e=>{acc.setYellow(e.target.checked); if(e.target.checked) acc.setBlack(false);}}/> Fond jaune</label>
+    <label className="block"><input type="checkbox" checked={acc.black} onChange={e=>{acc.setBlack(e.target.checked); if(e.target.checked) acc.setYellow(false);}}/> Écran noir</label>
+    <label className="block"><input type="checkbox" checked={acc.audio} onChange={e=>acc.setAudio(e.target.checked)}/> Audio</label>
+  </div>);
+}
+function TopNav({route,go}){
+  return (<div className="mb-6 rounded-3xl overflow-hidden shadow-sm border card">
+    <div className="px-4 py-3 text-white flex items-center justify-between" style={{backgroundColor:BRAND}}>
+      <div className="flex items-center gap-3">
+        <img src="dogbot.png" className="h-8 w-8 rounded-lg bg-white/90 p-1" alt="Dogbot"/>
+        <div><div className="font-black leading-tight">Sacado Académie</div><div className="text-xs opacity-90">Ateliers d’additions & soustractions</div></div>
+      </div>
+      <img src="sacado.png" className="h-8 w-auto rounded bg-white/90 p-0.5" alt="Sacado"/>
     </div>
-    <div class="math"><span class="a" id="ahLeft">?</span> + <span class="b" id="ahRight">4</span> = <span class="r" id="ahRes">7</span></div>
-    <div class="controls row"><input class="answer" id="ahAns" type="text" inputmode="numeric" placeholder="?" /><button class="btn green" id="ahVal">Valider</button></div>
-  </section>
-
-  <!-- DOUBLES -->
-  <section id="doubles" class="card hidden">
-    <h2>Doubles aléatoires</h2>
-    <div class="controls"><button class="btn yellow" id="startDbl">Nouveau</button><span class="badge" id="scoreDbl">0 / 0</span></div>
-    <div class="math"><span class="a" id="dblN">6</span> + <span class="a">6</span> = <span class="r">?</span></div>
-    <div class="row"><input class="answer" id="dblAns" type="text" inputmode="numeric" placeholder="?" /><button class="btn green" id="dblVal">Valider</button></div>
-  </section>
-
-  <!-- MOITIÉS -->
-  <section id="moities" class="card hidden">
-    <h2>Moitiés</h2>
-    <div class="controls"><button class="btn yellow" id="startHalf">Nouveau</button><span class="badge" id="scoreHalf">0 / 0</span></div>
-    <div class="math"><span class="a" id="halfN">14</span> ÷ 2 = <span class="r">?</span></div>
-    <div class="row"><input class="answer" id="halfAns" type="text" inputmode="numeric" placeholder="?" /><button class="btn green" id="halfVal">Valider</button></div>
-  </section>
-
-  <!-- SOUSTRACTION VISUELLE (pommes barrées) -->
-  <section id="subSimple" class="card hidden">
-    <h2>Soustractions visuelles (pommes barrées)</h2>
-    <div class="controls">
-      <span class="badge">Niveau</span>
-      <select id="lvlSubSimple"><option value="1" selected>1 (≤ 5)</option><option value="2">2 (≤ 10)</option></select>
-      <span class="badge">Questions</span>
-      <select id="qSubSimple"><option>5</option><option selected>10</option><option>15</option></select>
-      <button class="btn yellow" id="startSubSimple">Démarrer</button>
-      <span class="badge" id="scoreSubSimple">0 / 0</span>
+    <div className="px-4 py-3 flex flex-wrap gap-2 bg-white/60">
+      {[{k:"/",label:"Accueil"},{k:"/add",label:"Jeu — Additions"},{k:"/sub",label:"Jeu — Soustractions"},{k:"/pytha",label:"Jeu — Pythagore (additions)"}].map(tab=>(
+        <button key={tab.k} onClick={()=>go(tab.k)} className={"pill "+(route===tab.k?"active":"")}>{tab.label}</button>
+      ))}
     </div>
-    <div class="math"><span class="a" id="ssA">9</span> − <span class="b" id="ssB">4</span> = <span class="r" id="ssR">?</span></div>
-    <div class="line"><div id="ssApples" class="appleBox"></div></div>
-    <div class="numberline" id="ssLine"></div>
-    <div class="controls"><button class="btn green" id="ssShow">Réponse</button></div>
-  </section>
-
-  <!-- SOUSTRACTION À TROU -->
-  <section id="subTrou" class="card hidden">
-    <h2>Soustractions à trou</h2>
-    <div class="controls">
-      <span class="badge">Niveau</span>
-      <select id="lvlSubHole"><option value="1">1 (≤ 5)</option><option value="2" selected>2 (≤ 10)</option></select>
-      <span class="badge">Questions</span>
-      <select id="qSubHole"><option>5</option><option selected>10</option><option>15</option></select>
-      <button class="btn yellow" id="startSubHole">Démarrer</button>
-      <span class="badge" id="scoreSubHole">0 / 0</span>
+  </div>);
+}
+function Progress({remaining,total}){ if(total==null) return null; const pct=Math.max(0,Math.min(100,(remaining/total)*100)); return <div className="progress-wrap mt-2"><div className="progress-bar" style={{width:`${pct}%`}}></div></div>; }
+const vibrate=(p=[60,40,120])=>{ try{ if(navigator.vibrate) navigator.vibrate(p);}catch(_){}};
+const shuffle=a=>a.sort(()=>Math.random()-0.5); const rand=(min,max)=>min+Math.floor(Math.random()*(max-min+1));
+function Recap({answers,onReplay,cardStyle}){
+  const total=answers.length, ok=answers.filter(a=>a.correct).length;
+  return (<div className="card rounded-2xl p-6" style={cardStyle}>
+    <h2 className="text-2xl font-bold mb-2">Résultats 🎯</h2>
+    <p className="mb-4">Tu as réussi <strong>{ok}/{total}</strong> questions.</p>
+    <div className="overflow-auto"><table className="w-full border-collapse min-w-[800px]"><thead><tr className="hdr">
+      <th className="border px-3 py-2 text-left">#</th><th className="border px-3 py-2 text-left">Question</th><th className="border px-3 py-2 text-left">Bonne réponse</th><th className="border px-3 py-2 text-left">Ta réponse</th><th className="border px-3 py-2 text-left">Statut</th><th className="border px-3 py-2 text-left">Remarque</th>
+    </tr></thead><tbody>
+    {answers.map((a,i)=>{ const rowCls=a.correct?"ok":"ko"; const extra=a.timeout?"⏳ Temps dépassé":(a.user==null?"Aucune réponse":""); return(
+      <tr key={i} className={rowCls}><td className="border px-3 py-2">{i+1}</td><td className="border px-3 py-2">{a.q}</td><td className="border px-3 py-2">{a.good}</td><td className="border px-3 py-2">{a.user==null?"—":String(a.user)}</td><td className="border px-3 py-2">{a.correct?"✅ Correct":"❌ Incorrect"}</td><td className="border px-3 py-2 text-slate-600">{extra}</td></tr>
+    );})}
+    </tbody></table></div>
+    <div className="flex gap-2 justify-center mt-6"><button onClick={onReplay} className="px-5 py-3 rounded-2xl text-white font-semibold shadow" style={{backgroundColor:BRAND}}>Rejouer</button><a href="#/" className="px-5 py-3 rounded-2xl border">Retour au menu</a></div>
+  </div>);
+}
+function GameAdd({acc}){
+  const {rootBg,rootText,cardStyle}=acc;
+  const [mode,setMode]=useState("decouverte"); const [questionCount,setQuestionCount]=useState(10); const [timeLimit,setTimeLimit]=useState(5);
+  const [started,setStarted]=useState(false), [finished,setFinished]=useState(false);
+  const [answers,setAnswers]=useState([]); const [tick,setTick]=useState(0);
+  const [idx,setIdx]=useState(0); const [items,setItems]=useState([]);
+  const [a,setA]=useState(""),[b,setB]=useState(""),[r,setR]=useState(""); const [one,setOne]=useState("");
+  useEffect(()=>{ if(!started||finished) return; const id=setInterval(()=>setTick(t=>t+1),1000); return ()=>clearInterval(id);},[started,finished]);
+  const init=()=>{ let list=[]; if(mode==="decouverte"){ for(let i=0;i<questionCount;i++){ const x=rand(0,5), y=rand(0,5); list.push({a:x,b:y,r:x+y}); } } 
+    else if(mode==="doubles"){ list=shuffle(Array.from({length:10},(_,i)=>({a:i+1,b:i+1,r:2*(i+1)}))).slice(0,questionCount); }
+    else if(mode==="moities"){ const evens=shuffle(Array.from({length:10},(_,i)=>(i+1)*2)); list=evens.slice(0,Math.min(questionCount,evens.length)).map(t=>({total:t,half:t/2})); }
+    else if(mode==="trou"){ const layouts=["a+_=r","_=b=r","r=a+_"]; for(let i=0;i<questionCount;i++){ const x=rand(0,10), y=rand(0,10-x), r=x+y, L=layouts[rand(0,2)]; list.push({a:x,b:y,r,layout:L}); } }
+    else { for(let i=0;i<questionCount;i++){ const pick=rand(1,3); if(pick===1){ const x=rand(0,10), y=rand(0,10-x); list.push({kind:"simple",a:x,b:y,r:x+y}); } else if(pick===2){ const n=rand(1,10); list.push({kind:"double",a:n,b:n,r:2*n}); } else { const x=rand(0,10), y=rand(0,10-x), r=x+y; const L=["a+_=r","_=b=r","r=a+_"][rand(0,2)]; list.push({kind:"trou",a:x,b:y,r,layout:L}); } } }
+    setItems(list); setIdx(0); setAnswers([]); setTick(0); setA(""); setB(""); setR(""); setOne(""); setStarted(true); setFinished(false);
+  };
+  useEffect(()=>{ if(!started||finished) return; if(timeLimit!=null && tick>=timeLimit){ vibrate(); submit(true);} },[tick]);
+  const current=items[idx]; const remaining=timeLimit==null?null:Math.max(0,timeLimit-tick);
+  const submit=(timeout=false)=>{
+    if(!current) return; let right=false, userStr=null, qtxt="", goodTxt="";
+    if(mode==="decouverte"){ const ai=parseInt(a,10), bi=parseInt(b,10), ri=parseInt(r,10); const provided=Number.isInteger(ai)&&Number.isInteger(bi)&&Number.isInteger(ri);
+      right=!timeout && provided && ai===current.a && bi===current.b && ri===current.r; userStr=provided?`${ai} + ${bi} = ${ri}`:null; qtxt=`${current.a} + ${current.b} = ${current.r}`; goodTxt=qtxt; }
+    else if(mode==="doubles"){ const guess=parseInt(one,10); right=!timeout && Number.isInteger(guess) && guess===current.r; userStr=Number.isInteger(guess)?String(guess):null; qtxt=`${current.a} + ${current.b} = ?`; goodTxt=String(current.r); }
+    else if(mode==="moities"){ const guess=parseInt(one,10); right=!timeout && Number.isInteger(guess) && 2*guess===current.total; userStr=Number.isInteger(guess)?String(guess):null; qtxt=`Moitié de ${current.total}`; goodTxt=String(current.half); }
+    else if(mode==="trou"){ const guess=parseInt(one,10); let expected; if(current.layout==="a+_=r"){ expected=current.r-current.a; qtxt=`${current.a} + [ ] = ${current.r}`; } else if(current.layout==="_=b=r"){ expected=current.r-current.b; qtxt=`[ ] + ${current.b} = ${current.r}`;} else { expected=current.r-current.a; qtxt=`${current.r} = ${current.a} + [ ]`; } right=!timeout && Number.isInteger(guess) && guess===expected; userStr=Number.isInteger(guess)?String(guess):null; goodTxt=String(expected); }
+    else { if(current.kind==="simple"){ const guess=parseInt(one,10); right=!timeout && Number.isInteger(guess)&&guess===current.r; userStr=Number.isInteger(guess)?String(guess):null; qtxt=`${current.a} + ${current.b} = ?`; goodTxt=String(current.r); }
+      else if(current.kind==="double"){ const guess=parseInt(one,10); right=!timeout && Number.isInteger(guess)&&guess===current.r; userStr=Number.isInteger(guess)?String(guess):null; qtxt=`${current.a} + ${current.b} = ?`; goodTxt=String(current.r); }
+      else { const guess=parseInt(one,10); let expected; if(current.layout==="a+_=r"){ expected=current.r-current.a; qtxt=`${current.a} + [ ] = ${current.r}`; } else if(current.layout==="_=b=r"){ expected=current.r-current.b; qtxt=`[ ] + ${current.b} = ${current.r}`;} else { expected=current.r-current.a; qtxt=`${current.r} = ${current.a} + [ ]`; } right=!timeout && Number.isInteger(guess)&&guess===expected; userStr=Number.isInteger(guess)?String(guess):null; goodTxt=String(expected); } }
+    setAnswers(p=>[...p,{q:qtxt,good:goodTxt,user:userStr,correct:right,timeout}]);
+    if(idx+1>=items.length){ setFinished(true); setStarted(false);} else { setIdx(i=>i+1); setTick(0); setA(""); setB(""); setR(""); setOne(""); }
+  };
+  return (<div className={(acc.black?"dark-mode ":"")+(acc.yellow && !acc.black?"yellow-mode ":"")+"min-h-screen p-6"} style={{backgroundColor:acc.rootBg,color:acc.rootText}}>
+    <div className="max-w-5xl mx-auto space-y-6">
+      {!started && !finished && (<div className="grid md:grid-cols-3 gap-4">
+        <AccessibilityCard acc={acc}/>
+        <div className="card rounded-2xl p-4" style={acc.cardStyle}>
+          <div className="font-bold mb-2">Mode</div>
+          <div className="grid gap-1">
+            <label><input type="radio" name="m1" checked={mode==="decouverte"} onChange={()=>setMode("decouverte")}/> Découverte visuelle (écrire l’addition)</label>
+            <label><input type="radio" name="m1" checked={mode==="doubles"} onChange={()=>setMode("doubles")}/> Doubles (ordre aléatoire)</label>
+            <label><input type="radio" name="m1" checked={mode==="moities"} onChange={()=>setMode("moities")}/> Moitiés</label>
+            <label><input type="radio" name="m1" checked={mode==="trou"} onChange={()=>setMode("trou")}/> Additions à trou</label>
+            <label><input type="radio" name="m1" checked={mode==="defis"} onChange={()=>setMode("defis")}/> Défis mélangés</label>
+          </div>
+          <div className="font-bold mt-3 mb-1">Nombre de questions</div>
+          <div className="flex gap-2 flex-wrap">{[5,10,15,20].map(n=><button key={n} onClick={()=>setQuestionCount(n)} className={"pill "+(questionCount===n?"active":"")}>{n}</button>)}</div>
+          <div className="font-bold mt-3 mb-1">Temps par question</div>
+          <div className="flex gap-2 flex-wrap">{[3,5,10].map(s=><button key={s} onClick={()=>setTimeLimit(s)} className={"pill "+(timeLimit===s?"active":"")}>{s}s</button>)}<button onClick={()=>setTimeLimit(null)} className={"pill "+(timeLimit==null?"active":"")}>Pas de chrono</button></div>
+        </div>
+        <div className="card rounded-2xl p-4" style={acc.cardStyle}><div className="font-bold mb-2">Action</div><button onClick={init} className="px-4 py-2 rounded-2xl text-white" style={{backgroundColor:BRAND}}>Commencer</button></div>
+      </div>)}
+      {started && items[idx] && (<>
+        <div className="card rounded-2xl p-3" style={acc.cardStyle}>
+          <div className="flex items-center justify-between"><div><strong>Question :</strong> {idx+1} / {items.length}</div><div><strong>⏱ Temps :</strong> {timeLimit==null?"Pas de chrono":`${Math.max(0,(timeLimit - tick))}s`}</div></div>
+          <Progress remaining={timeLimit==null?0:Math.max(0,timeLimit - tick)} total={timeLimit}/>
+        </div>
+        {mode==="decouverte" && (<div className="rounded-3xl border p-6 text-center shadow-sm card" style={acc.cardStyle}>
+          <div className="mb-4 text-slate-700">Observe les bulles puis écris l’addition</div>
+          <div className="flex gap-8 justify-center items-center mb-4">
+            <div className="flex gap-2 flex-wrap">{Array.from({length:items[idx].a}).map((_,i)=>(<div key={i} className="h-6 w-6 rounded-full" style={{background:"#7ad1c9"}}/>))}</div>
+            <div className="text-3xl font-bold">+</div>
+            <div className="flex gap-2 flex-wrap">{Array.from({length:items[idx].b}).map((_,i)=>(<div key={i} className="h-6 w-6 rounded-full" style={{background:"#ffd9b3"}}/>))}</div>
+          </div>
+          <form onSubmit={(e)=>{e.preventDefault(); submit(false);}} className="flex gap-3 justify-center items-center">
+            <input value={a} onChange={e=>setA(e.target.value.replace(/\D/g,""))} inputMode="numeric" className="w-20 text-center text-2xl px-3 py-2 rounded-2xl border violet-border fill-hint diag-txt"/>
+            <span className="text-2xl font-bold">+</span>
+            <input value={b} onChange={e=>setB(e.target.value.replace(/\D/g,""))} inputMode="numeric" className="w-20 text-center text-2xl px-3 py-2 rounded-2xl border violet-border fill-hint diag-txt"/>
+            <span className="text-2xl font-bold">=</span>
+            <input value={r} onChange={e=>setR(e.target.value.replace(/\D/g,""))} inputMode="numeric" className="w-20 text-center text-2xl px-3 py-2 rounded-2xl border violet-border fill-hint diag-txt"/>
+            <button className="px-5 py-3 rounded-2xl text-white font-semibold shadow" style={{backgroundColor:BRAND}} type="submit">Valider</button>
+          </form>
+        </div>)}
+        {mode!=="decouverte" && (<div className="rounded-3xl border p-6 text-center shadow-sm card" style={acc.cardStyle}>
+          {mode==="doubles" && <div className="text-4xl font-black mb-4">{items[idx].a} + {items[idx].b} = ?</div>}
+          {mode==="moities" && <div className="text-4xl font-black mb-4">Moitié de {items[idx].total} = ?</div>}
+          {mode==="trou" && (<div className="text-4xl font-black mb-4">
+            {items[idx].layout==="a+_=r" && <>{items[idx].a} + <span className="inline-block px-3 py-1 rounded-2xl border violet-border">[ case ]</span> = {items[idx].r}</>}
+            {items[idx].layout==="_=b=r" && <><span className="inline-block px-3 py-1 rounded-2xl border violet-border">[ case ]</span> + {items[idx].b} = {items[idx].r}</>}
+            {items[idx].layout==="r=a+_" && <>{items[idx].r} = {items[idx].a} + <span className="inline-block px-3 py-1 rounded-2xl border violet-border">[ case ]</span></>}
+          </div>)}
+          {mode==="defis" && (<div className="text-4xl font-black mb-4">
+            {items[idx].kind==="simple"  && <>{items[idx].a} + {items[idx].b} = ?</>}
+            {items[idx].kind==="double"  && <>{items[idx].a} + {items[idx].b} = ?</>}
+            {items[idx].kind==="trou"    && (<>
+              {items[idx].layout==="a+_=r" && <>{items[idx].a} + <span className="inline-block px-3 py-1 rounded-2xl border violet-border">[ case ]</span> = {items[idx].r}</>}
+              {items[idx].layout==="_=b=r" && <><span className="inline-block px-3 py-1 rounded-2xl border violet-border">[ case ]</span> + {items[idx].b} = {items[idx].r}</>}
+              {items[idx].layout==="r=a+_" && <>{items[idx].r} = {items[idx].a} + <span className="inline-block px-3 py-1 rounded-2xl border violet-border">[ case ]</span></>}
+            </>)}
+          </div>)}
+          <form onSubmit={(e)=>{e.preventDefault(); submit(false);}} className="flex gap-3 justify-center items-center">
+            <input value={one} onChange={e=>setOne(e.target.value.replace(/\D/g,""))} inputMode="numeric" className="w-28 text-center text-3xl px-4 py-3 rounded-2xl border violet-border fill-hint diag-txt"/>
+            <button className="px-5 py-3 rounded-2xl text-white font-semibold shadow" style={{backgroundColor:BRAND}} type="submit">Valider</button>
+          </form>
+        </div>)}
+      </>)}
+      {finished && <Recap answers={answers} cardStyle={acc.cardStyle} onReplay={()=>{ setStarted(false); setFinished(false); setAnswers([]); setIdx(0); setItems([]); setTick(0); }}/>}        
+      <div className="mt-6"><a href="#/" className="px-4 py-2 rounded-2xl border">Retour au menu</a></div>
     </div>
-    <div class="math"><span class="a" id="shA">9</span> − <span class="b" id="shB">4</span> = <input class="answer" id="shAns" type="text" inputmode="numeric" placeholder="?" /></div>
-    <div class="controls"><button class="btn green" id="shVal">Valider</button></div>
-  </section>
-
-  <div class="small">Astuce : ❓ remplace la case à compléter. Les pommes barrées montrent la soustraction.</div>
-</div>
-
-<script>
-function show(id){document.querySelectorAll('.card').forEach(s=>s.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');}
-function rint(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
-// Pomme inline (pas besoin d'image externe)
-function appleSVG(){return '<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path fill="#9acd32" d="M42 26c-6 0-9 5-10 5s-4-5-10-5c-7 0-12 6-12 13 0 12 10 19 22 19s22-7 22-19c0-7-5-13-12-13z"/><path fill="#7caf00" d="M40 22c-3 0-6 2-8 4-2-2-5-4-8-4-1 0-2 0-3 .3 3-3 7-5 11-5s8 2 11 5c-1-.3-2-.3-3-.3z"/><path fill="#5b8a00" d="M34 13c1 3 1 5 1 5h-4s0-2 1-5c1-3 5-5 5-5s-2 3-3 5z"/></svg>';}
-
-/* -------- Additions simples -------- */
-const lvlAddSimple=document.getElementById('lvlAddSimple'), qAddSimple=document.getElementById('qAddSimple'), startAddSimple=document.getElementById('startAddSimple');
-const asA=document.getElementById('asA'), asB=document.getElementById('asB'), asAns=document.getElementById('asAns'), asVal=document.getElementById('asVal'), scoreAddSimple=document.getElementById('scoreAddSimple');
-let asScore=0, asDone=0, asTarget=10;
-function nextAddSimple(){const max=(lvlAddSimple.value==='1')?4:10; const a=rint(0,max); const b=rint(0,max-a); asA.textContent=a; asB.textContent=b; asAns.value='';}
-asVal.addEventListener('click',()=>{const r=Number(asA.textContent)+Number(asB.textContent); if(Number(asAns.value)===r) asScore++; asDone++; scoreAddSimple.textContent=asScore+' / '+asDone; if(asDone>=asTarget){alert('Série terminée'); asDone=0; asScore=0;} nextAddSimple();});
-startAddSimple.addEventListener('click',()=>{asTarget=Number(qAddSimple.value); asScore=0; asDone=0; scoreAddSimple.textContent='0 / 0'; nextAddSimple();});
-
-/* -------- Addition à trou (❓) -------- */
-const lvlAddHole=document.getElementById('lvlAddHole'), qAddHole=document.getElementById('qAddHole'), startAddHole=document.getElementById('startAddHole');
-const ahLeft=document.getElementById('ahLeft'), ahRight=document.getElementById('ahRight'), ahRes=document.getElementById('ahRes'), ahAns=document.getElementById('ahAns'), ahVal=document.getElementById('ahVal'), scoreAddHole=document.getElementById('scoreAddHole');
-let ahScore=0, ahDone=0, ahTarget=10, ahCorrect=0;
-function nextAddHole(){const max=(lvlAddHole.value==='1')?4:10; const a=rint(0,max); const b=rint(0,max-a); ahLeft.textContent='?'; ahRight.textContent=b; ahRes.textContent=a+b; ahCorrect=a; ahAns.value='';}
-ahVal.addEventListener('click',()=>{if(Number(ahAns.value)===ahCorrect) ahScore++; ahDone++; scoreAddHole.textContent=ahScore+' / '+ahDone; if(ahDone>=ahTarget){alert('Série terminée'); ahDone=0; ahScore=0;} nextAddHole();});
-startAddHole.addEventListener('click',()=>{ahTarget=Number(qAddHole.value); ahScore=0; ahDone=0; scoreAddHole.textContent='0 / 0'; nextAddHole();});
-
-/* -------- Doubles -------- */
-const dblN=document.getElementById('dblN'), dblAns=document.getElementById('dblAns'), dblVal=document.getElementById('dblVal'), startDbl=document.getElementById('startDbl'), scoreDbl=document.getElementById('scoreDbl');
-let dblScore=0, dblDone=0; function nextDbl(){const n=rint(0,10); dblN.textContent=n; dblAns.value='';}
-dblVal.addEventListener('click',()=>{const n=Number(dblN.textContent); if(Number(dblAns.value)===n*2) dblScore++; dblDone++; scoreDbl.textContent=dblScore+' / '+dblDone; nextDbl();});
-startDbl.addEventListener('click',()=>{dblScore=0; dblDone=0; scoreDbl.textContent='0 / 0'; nextDbl();});
-
-/* -------- Moitiés -------- */
-const halfN=document.getElementById('halfN'), halfAns=document.getElementById('halfAns'), halfVal=document.getElementById('halfVal'), startHalf=document.getElementById('startHalf'), scoreHalf=document.getElementById('scoreHalf');
-let halfScore=0, halfDone=0; function nextHalf(){const ev=[0,2,4,6,8,10,12,14,16,18,20]; const v=ev[rint(0,ev.length-1)]; halfN.textContent=v; halfAns.value='';}
-halfVal.addEventListener('click',()=>{const v=Number(halfN.textContent); if(Number(halfAns.value)===v/2) halfScore++; halfDone++; scoreHalf.textContent=halfScore+' / '+halfDone; nextHalf();});
-startHalf.addEventListener('click',()=>{halfScore=0; halfDone=0; scoreHalf.textContent='0 / 0'; nextHalf();});
-
-/* -------- Soustraction visuelle (pommes barrées) -------- */
-const lvlSubSimple=document.getElementById('lvlSubSimple'), qSubSimple=document.getElementById('qSubSimple'), startSubSimple=document.getElementById('startSubSimple');
-const ssA=document.getElementById('ssA'), ssB=document.getElementById('ssB'), ssR=document.getElementById('ssR'), ssApples=document.getElementById('ssApples'), ssLine=document.getElementById('ssLine'), ssShow=document.getElementById('ssShow'), scoreSubSimple=document.getElementById('scoreSubSimple');
-let ssScore=0, ssDone=0, ssTarget=10, ssCorrect=0;
-function renderApples(a,b){ssApples.innerHTML=''; for(let i=0;i<a;i++){const box=document.createElement('div'); box.className='apple'; box.innerHTML=appleSVG(); if(i<b) box.classList.add('cross'); ssApples.appendChild(box);} ssLine.innerHTML=''; for(let i=1;i<=Math.max(10,a);i++){const sq=document.createElement('div'); sq.className='square'+(i===a?' green':''); if(i>=(a-b+1) && i<=a) sq.classList.add('blue'); sq.textContent=String(i); ssLine.appendChild(sq);}}
-function nextSubSimple(){const max=(lvlSubSimple.value==='1')?5:10; const a=rint(0,max); const b=rint(0,a); ssA.textContent=a; ssB.textContent=b; ssR.textContent='?'; ssCorrect=a-b; renderApples(a,b);}
-ssShow.addEventListener('click',()=>{ssR.textContent=ssCorrect; ssScore++; ssDone++; scoreSubSimple.textContent=ssScore+' / '+ssDone; if(ssDone>=ssTarget){alert('Série terminée'); ssDone=0; ssScore=0;} nextSubSimple();});
-startSubSimple.addEventListener('click',()=>{ssTarget=Number(qSubSimple.value); ssScore=0; ssDone=0; scoreSubSimple.textContent='0 / 0'; nextSubSimple();});
-
-/* -------- Soustraction à trou -------- */
-const lvlSubHole=document.getElementById('lvlSubHole'), qSubHole=document.getElementById('qSubHole'), startSubHole=document.getElementById('startSubHole');
-const shA=document.getElementById('shA'), shB=document.getElementById('shB'), shAns=document.getElementById('shAns'), shVal=document.getElementById('shVal'), scoreSubHole=document.getElementById('scoreSubHole');
-let shScore=0, shDone=0, shTarget=10, shCorrect=0;
-function nextSubHole(){const max=(lvlSubHole.value==='1')?5:10; const a=rint(0,max); const b=rint(0,a); shA.textContent=a; shB.textContent=b; shCorrect=a-b; shAns.value='';}
-shVal.addEventListener('click',()=>{if(Number(shAns.value)===shCorrect) shScore++; shDone++; scoreSubHole.textContent=shScore+' / '+shDone; if(shDone>=shTarget){alert('Série terminée'); shDone=0; shScore=0;} nextSubHole();});
-startSubHole.addEventListener('click',()=>{shTarget=Number(qSubHole.value); shScore=0; shDone=0; scoreSubHole.textContent='0 / 0'; nextSubHole();});
-
-/* Écran par défaut */
-show('addSimple');
+  </div>);
+}
+function GameSub({acc}){
+  const {rootBg,rootText,cardStyle}=acc;
+  const [mode,setMode]=useState("decouverte"); const [questionCount,setQuestionCount]=useState(10); const [timeLimit,setTimeLimit]=useState(5);
+  const [started,setStarted]=useState(false), [finished,setFinished]=useState(false); const [answers,setAnswers]=useState([]); const [tick,setTick]=useState(0);
+  const [idx,setIdx]=useState(0); const [items,setItems]=useState([]); const [one,setOne]=useState("");
+  useEffect(()=>{ if(!started||finished) return; const id=setInterval(()=>setTick(t=>t+1),1000); return ()=>clearInterval(id);},[started,finished]);
+  const init=()=>{ let list=[]; if(mode==="decouverte"){ for(let i=0;i<questionCount;i++){ const a=rand(1,10), b=rand(0,a); list.push({a,b,r:a-b}); } }
+    else if(mode==="trou"){ const L=["a-_=r","_=b=r-","r=_-b"]; for(let i=0;i<questionCount;i++){ const a=rand(0,10), b=rand(0,a), r=a-b; list.push({a,b,r,layout:L[rand(0,2)]}); } }
+    else { for(let i=0;i<questionCount;i++){ const a=rand(0,10), b=rand(0,a); if(Math.random()<0.5) list.push({kind:"simple",a,b,r:a-b}); else { const L=["a-_=r","_=b=r-","r=_-b"][rand(0,2)]; list.push({kind:"trou",a,b,r:a-b,layout:L}); } } }
+    setItems(list); setIdx(0); setAnswers([]); setTick(0); setOne(""); setStarted(true); setFinished(false);
+  };
+  useEffect(()=>{ if(!started||finished) return; if(timeLimit!=null && tick>=timeLimit){ vibrate(); submit(true);} },[tick]);
+  const current=items[idx]; const remaining=timeLimit==null?null:Math.max(0,timeLimit-tick);
+  const submit=(timeout=false)=>{ if(!current) return; let right=false, user=null, qtxt="", goodTxt="";
+    if(mode==="decouverte"){ const guess=parseInt(one,10); right=!timeout && Number.isInteger(guess) && guess===current.r; user=Number.isInteger(guess)?String(guess):null; qtxt=`${current.a} – ${current.b} = ?`; goodTxt=String(current.r); }
+    else if(mode==="trou"){ const guess=parseInt(one,10); let expected; if(current.layout==="a-_=r"){ expected=current.a-current.r; qtxt=`${current.a} – [ ] = ${current.r}`; } else if(current.layout==="_=b=r-"){ expected=current.r+current.b; qtxt=`[ ] – ${current.b} = ${current.r}`; } else { expected=current.r+current.b; qtxt=`${current.r} = [ ] – ${current.b}`; } right=!timeout && Number.isInteger(guess)&&guess===expected; user=Number.isInteger(guess)?String(guess):null; goodTxt=String(expected); }
+    else { const guess=parseInt(one,10); if(current.kind==="simple"){ right=!timeout && Number.isInteger(guess)&&guess===current.r; user=Number.isInteger(guess)?String(guess):null; qtxt=`${current.a} – ${current.b} = ?`; goodTxt=String(current.r); }
+      else { let expected; if(current.layout==="a-_=r"){ expected=current.a-current.r; qtxt=`${current.a} – [ ] = ${current.r}`; } else if(current.layout==="_=b=r-"){ expected=current.r+current.b; qtxt=`[ ] – ${current.b} = ${current.r}`; } else { expected=current.r+current.b; qtxt=`${current.r} = [ ] – ${current.b}`; } right=!timeout && Number.isInteger(guess)&&guess===expected; user=Number.isInteger(guess)?String(guess):null; goodTxt=String(expected); } }
+    setAnswers(p=>[...p,{q:qtxt,good:goodTxt,user,correct:right,timeout}]);
+    if(idx+1>=items.length){ setFinished(true); setStarted(false);} else { setIdx(i=>i+1); setTick(0); setOne(""); }
+  };
+  return (<div className={(acc.black?"dark-mode ":"")+(acc.yellow && !acc.black?"yellow-mode ":"")+"min-h-screen p-6"} style={{backgroundColor:acc.rootBg,color:acc.rootText}}>
+    <div className="max-w-5xl mx-auto space-y-6">
+      {!started && !finished && (<div className="grid md:grid-cols-3 gap-4">
+        <AccessibilityCard acc={acc}/>
+        <div className="card rounded-2xl p-4" style={acc.cardStyle}>
+          <div className="font-bold mb-2">Mode</div>
+          <div className="grid gap-1">
+            <label><input type="radio" name="m2" checked={mode==="decouverte"} onChange={()=>setMode("decouverte")}/> Découverte visuelle</label>
+            <label><input type="radio" name="m2" checked={mode==="trou"} onChange={()=>setMode("trou")}/> Soustractions à trou</label>
+            <label><input type="radio" name="m2" checked={mode==="defis"} onChange={()=>setMode("defis")}/> Défis mélangés</label>
+          </div>
+          <div className="font-bold mt-3 mb-1">Nombre de questions</div>
+          <div className="flex gap-2 flex-wrap">{[5,10,15,20].map(n=><button key={n} onClick={()=>setQuestionCount(n)} className={"pill "+(questionCount===n?"active":"")}>{n}</button>)}</div>
+          <div className="font-bold mt-3 mb-1">Temps par question</div>
+          <div className="flex gap-2 flex-wrap">{[3,5,10].map(s=><button key={s} onClick={()=>setTimeLimit(s)} className={"pill "+(timeLimit===s?"active":"")}>{s}s</button>)}<button onClick={()=>setTimeLimit(null)} className={"pill "+(timeLimit==null?"active":"")}>Pas de chrono</button></div>
+        </div>
+        <div className="card rounded-2xl p-4" style={acc.cardStyle}><div className="font-bold mb-2">Action</div><button onClick={init} className="px-4 py-2 rounded-2xl text-white" style={{backgroundColor:BRAND}}>Commencer</button></div>
+      </div>)}
+      {started && items[idx] && (<>
+        <div className="card rounded-2xl p-3" style={acc.cardStyle}><div className="flex items-center justify-between"><div><strong>Question :</strong> {idx+1} / {items.length}</div><div><strong>⏱ Temps :</strong> {timeLimit==null?"Pas de chrono":`${Math.max(0,(timeLimit - tick))}s`}</div></div><Progress remaining={timeLimit==null?0:Math.max(0,timeLimit - tick)} total={timeLimit}/></div>
+        <div className="rounded-3xl border p-6 text-center shadow-sm card" style={acc.cardStyle}>
+          <div className="text-4xl font-black mb-4">
+            {mode==="decouverte" && <>{items[idx].a} – {items[idx].b} = ?</>}
+            {mode!=="decouverte" && (<>
+              {items[idx].kind==="simple" && <>{items[idx].a} – {items[idx].b} = ?</>}
+              {items[idx].kind==="trou" && (<>
+                {items[idx].layout==="a-_=r"   && <>{items[idx].a} – <span className="inline-block px-3 py-1 rounded-2xl border violet-border">[ case ]</span> = {items[idx].r}</>}
+                {items[idx].layout==="_=b=r-" && <><span className="inline-block px-3 py-1 rounded-2xl border violet-border">[ case ]</span> – {items[idx].b} = {items[idx].r}</>}
+                {items[idx].layout==="r=_-b"  && <>{items[idx].r} = <span className="inline-block px-3 py-1 rounded-2xl border violet-border">[ case ]</span> – {items[idx].b}</>}
+              </>)}
+            </>)}
+          </div>
+          <form onSubmit={(e)=>{e.preventDefault(); submit(false);}} className="flex gap-3 justify-center items-center">
+            <input value={one} onChange={e=>setOne(e.target.value.replace(/\D/g,""))} inputMode="numeric" className="w-28 text-center text-3xl px-4 py-3 rounded-2xl border violet-border fill-hint diag-txt"/>
+            <button className="px-5 py-3 rounded-2xl text-white font-semibold shadow" style={{backgroundColor:BRAND}} type="submit">Valider</button>
+          </form>
+        </div>
+      </>)}
+      {finished && <Recap answers={answers} cardStyle={acc.cardStyle} onReplay={()=>{ setStarted(false); setFinished(false); setAnswers([]); setIdx(0); setItems([]); setTick(0); }}/>}        
+      <div className="mt-6"><a href="#/" className="px-4 py-2 rounded-2xl border">Retour au menu</a></div>
+    </div>
+  </div>);
+}
+function GamePythaAdd({acc}){
+  const A=range(1,10), B=range(1,10);
+  const [mode,setMode]=useState("random"); const [count,setCount]=useState(20); const [row,setRow]=useState(5);
+  const [values,setValues]=useState({}); const [checked,setChecked]=useState({}); const [feedback,setFeedback]=useState(null);
+  const blanks=useMemo(()=>{ const s=new Set(); if(mode==="random"){ const all=[]; for(const a of A)for(const b of B) all.push(`${a}+${b}`); while(s.size<Math.min(count,all.length)) s.add(all[Math.floor(Math.random()*all.length)]); } else { for(const b of B) s.add(`${row}+${b}`); } return s; },[mode,count,row]);
+  const onChange=(k,v)=> setValues(p=>({...p,[k]:v.replace(/\D/g,"")}));
+  const check=()=>{ let total=0, errors=0; const res={}; for(const a of A)for(const b of B){ const k=`${a}+${b}`; if(!blanks.has(k)) continue; total++; const good=a+b; const v=values[k]; const ok=v!==undefined && v!=="" && Number(v)===good; res[k]=ok?"ok":"ko"; if(!ok) errors++; } setChecked(res); if(total>0){ if(errors===0) setFeedback({type:"ok",msg:"Bravo ! Toutes les réponses sont correctes 🎉"}); else setFeedback({type:"ko",msg:`Tu as ${errors} erreur${errors>1?"s":""}. Essaie encore !`}); } else setFeedback(null); };
+  const reset=()=>{ setValues({}); setChecked({}); setFeedback(null); };
+  return (<div className={(acc.black?"dark-mode ":"")+(acc.yellow && !acc.black?"yellow-mode ":"")+"min-h-screen p-6"} style={{backgroundColor:acc.rootBg,color:acc.rootText}}>
+    <div className="max-w-6xl mx-auto">
+      <div className="grid xl:grid-cols-3 gap-4 mb-4">
+        <AccessibilityCard acc={acc}/>
+        <div className="card rounded-2xl p-4" style={acc.cardStyle}>
+          <div className="font-bold mb-2">Mode</div>
+          <div className="grid gap-2">
+            <label><input type="radio" name="mp" checked={mode==="random"} onChange={()=>setMode("random")}/> Cases aléatoires</label>
+            {mode==="random" && (<div className="ml-6"><label className="text-sm">Nombre de cases</label><input type="number" min="1" max="100" value={count} onChange={e=>setCount(parseInt(e.target.value)||1)} className="border rounded px-2 py-1 w-24 ml-2"/></div>)}
+            <label><input type="radio" name="mp" checked={mode==="row"} onChange={()=>setMode("row")}/> Ligne à compléter</label>
+            {mode==="row" && (<div className="ml-6"><label className="text-sm">Ligne (1..10)</label><select value={row} onChange={e=>setRow(parseInt(e.target.value))} className="border rounded px-2 py-1 ml-2">{A.map(t=><option key={t} value={t}>{t}</option>)}</select></div>)}
+          </div>
+        </div>
+        <div className="card rounded-2xl p-4 space-y-3" style={acc.cardStyle}>
+          <div className="font-bold mb-2">Actions</div>
+          <button onClick={check} className="px-4 py-2 rounded-2xl text-white mr-2" style={{backgroundColor:BRAND}}>Corriger</button>
+          <button onClick={reset} className="px-4 py-2 rounded-2xl border">Réinitialiser</button>
+          {feedback && (<div className={"bot-bubble "+feedback.type}><img src="dogbot.png" alt="DogBot"/><div className="msg"><div className="font-semibold" style={{color: feedback.type==="ok" ? "#16a34a" : "#dc2626"}}>DogBot</div><div>{feedback.msg}</div></div></div>)}
+        </div>
+      </div>
+      <div className="card rounded-2xl p-3 mb-4" style={acc.cardStyle}><strong>Consigne :</strong> <span className="diag-txt">Complète uniquement les cases violettes. Les diagonales sont des doubles (a+a).</span></div>
+      <div className="overflow-auto">
+        <table className="min-w-[900px] border-collapse w-full">
+          <thead><tr><th className="p-2 hdr text-left">+</th>{B.map(b=><th key={b} className="p-2 hdr">{b}</th>)}</tr></thead>
+          <tbody>
+            {A.map(a=>(<tr key={a}><th className="p-2 hdr text-left">{a}</th>
+              {B.map(b=>{ const k=`${a}+${b}`; const should=blanks.has(k); const st=checked[k]; const base="border rounded px-2 py-2 w-[84px] text-center text-lg violet-border fill-hint diag-txt";
+                return (<td key={k} className={"p-1 text-center "+(should?"fill-hint ":"")+(st==="ok"?" ok":st==="ko"?" ko":"")}>
+                  {should ? <input type="tel" value={values[k]||""} onChange={e=>onChange(k,e.target.value)} className={base}/> : <span className={"inline-block min-w-[84px] text-lg "+(a===b?"diag-txt":"")}>{a+b}</span>}
+                </td>);
+              })}
+            </tr>))}
+          </tbody>
+        </table>
+      </div>
+      <div className="mt-6"><a href="#/" className="px-4 py-2 rounded-2xl border">Retour au menu</a></div>
+    </div>
+  </div>);
+}
+function Hero(){ return(<header className="p-6 text-center rounded-3xl card" style={{background:"#efe7ff"}}>
+  <h1 className="text-3xl font-extrabold" style={{color:"var(--brand)"}}>Ateliers d’additions & soustractions</h1>
+  <p className="text-slate-700 mt-2">DogBot t’accompagne 🐾 — choisis ton jeu et tes réglages d’accessibilité.</p>
+  <img src="dogbot.png" className="mx-auto mt-4 h-24 w-24 rounded-full bg-white p-1 shadow" alt="Dogbot"/>
+</header>);}
+function Hub({go}){ return(<main className="max-w-5xl mx-auto px-4 py-8"><Hero/><h2 className="text-center text-2xl font-extrabold my-4" style={{color:"var(--brand)"}}>Choisis ton activité</h2><div className="grid md:grid-cols-3 gap-6">
+  <article className="card p-6"><h3 className="text-xl font-extrabold text-[color:var(--brand)]">Jeu — Additions</h3><a onClick={()=>go("/add")} className="btn mt-4 inline-block cursor-pointer">Commencer</a></article>
+  <article className="card p-6"><h3 className="text-xl font-extrabold text-[color:var(--brand)]">Jeu — Soustractions</h3><a onClick={()=>go("/sub")} className="btn mt-4 inline-block cursor-pointer">Jouer</a></article>
+  <article className="card p-6"><h3 className="text-xl font-extrabold text-[color:var(--brand)]">Jeu — Table de Pythagore (additions)</h3><a onClick={()=>go("/pytha")} className="btn mt-4 inline-block cursor-pointer">Découvrir</a></article>
+</div></main>);}
+function App(){
+  const [route,setRoute]=useState(location.hash.replace(/^#/,"")||"/");
+  const acc=useAccessibility();
+  useEffect(()=>{ const onHash=()=>setRoute(location.hash.replace(/^#/,"")||"/"); window.addEventListener("hashchange",onHash); return()=>window.removeEventListener("hashchange",onHash); },[]);
+  const go=k=>{ location.hash="#"+k; };
+  return(<div className="min-h-screen p-6" style={{background:acc.rootBg,color:acc.rootText}}>
+    <TopNav route={route} go={go}/>
+    {route==="/" && <Hub go={go}/>}
+    {route==="/add" && <GameAdd acc={acc}/>}
+    {route==="/sub" && <GameSub acc={acc}/>}
+    {route==="/pytha" && <GamePythaAdd acc={acc}/>}
+  </div>);
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
 </body>
 </html>
