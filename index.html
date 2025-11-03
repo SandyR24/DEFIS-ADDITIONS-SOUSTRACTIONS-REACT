@@ -148,7 +148,8 @@ function GameAdd({acc}){
   const init=()=>{
     let list=[];
     const make=(min,max)=>rand(min,max);
-    if(mode==="niveau1"){ for(let i=0;i<questionCount;i++){ const x=make(1,4),y=make(1,4); list.push({a:x,b:y,r:x+y}); } }
+    if(mode==="decouverte"){ for(let i=0;i<questionCount;i++){ let x=make(0,5),y=make(0,5); if(x+y===0){i--;continue;} list.push({a:x,b:y,r:x+y}); } }
+    else if(mode==="niveau1"){ for(let i=0;i<questionCount;i++){ const x=make(1,4),y=make(1,4); list.push({a:x,b:y,r:x+y}); } }
     else if(mode==="niveau2"){ for(let i=0;i<questionCount;i++){ const x=make(1,9),y=make(1,9); list.push({a:x,b:y,r:x+y}); } }
     else if(mode==="niveau3"){ for(let i=0;i<questionCount;i++){ let x=make(1,49),y=make(1,49-x%10); if((x%10)+(y%10)>=10) i--; else list.push({a:x,b:y,r:x+y}); } }
     else if(mode==="niveau4"){ for(let i=0;i<questionCount;i++){ const x=make(1,9)*10,y=make(1,9)*10; list.push({a:x,b:y,r:x+y}); } }
@@ -554,5 +555,6 @@ ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
 </body>
 </html>
+
 
 
