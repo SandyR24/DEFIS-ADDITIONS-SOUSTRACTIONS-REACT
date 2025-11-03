@@ -443,10 +443,10 @@ function GameSub({acc}){
           <div className="card rounded-2xl p-4" style={cardStyle}>
             <div className="font-bold mb-2">Mode</div>
             <div className="grid gap-1">
-              <label><input type="radio" checked={mode==="niveau1"} onChange={()=>setMode("niveau1")}/> Niveau 1 — &lt; 5</label>
-              <label><input type="radio" checked={mode==="niveau2"} onChange={()=>setMode("niveau2")}/> Niveau 2 — ≤ 10</label>
-              <label><input type="radio" checked={mode==="niveau3"} onChange={()=>setMode("niveau3")}/> Niveau 3 — &lt; 50 sans retenue</label>
-              <label><input type="radio" checked={mode==="niveau4"} onChange={()=>setMode("niveau4")}/> Niveau 4 — &lt; 100 sans retenue</label>
+              <label><input type="radio" checked={mode==="niveau1"} onChange={()=>setMode("niveau1")}/> Niveau 1 — c &lt; 5</label>
+              <label><input type="radio" checked={mode==="niveau2"} onChange={()=>setMode("niveau2")}/> Niveau 2 — Nombres ≤ 10</label>
+              <label><input type="radio" checked={mode==="niveau3"} onChange={()=>setMode("niveau3")}/> Niveau 3 — Nombres &lt; 50 sans retenue</label>
+              <label><input type="radio" checked={mode==="niveau4"} onChange={()=>setMode("niveau4")}/> Niveau 4 — Nombres &lt; 100 sans retenue</label>
               <label><input type="radio" checked={mode==="trou"} onChange={()=>setMode("trou")}/> Soustractions à trou</label>
               <label><input type="radio" checked={mode==="defis"} onChange={()=>setMode("defis")}/> Défis mélangés</label>
             </div>
@@ -615,6 +615,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
 </body>
 </html>
+
 
 
 
