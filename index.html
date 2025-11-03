@@ -495,10 +495,13 @@ function GameSub({acc}){
       )}
 
       {finished && <Recap answers={answers} cardStyle={cardStyle} onReplay={()=>{setStarted(false);setFinished(false);setAnswers([]);setIdx(0);setItems([]);setTick(0);}}/>}
-      <div className="mt-6"><a href="#/" className="px-4 py-2 rounded-2xl border">Retour au menu</a></div>
+      <div className="mt-6"><a href="#/" className="px-4 py-2 rounded-2xl border">Retour au menu</a>
+      </div>
     </div>
-  </div>);
+  </div>
+);
 }
+
 
 /* ---------- Table de Pythagore ---------- */
 function GamePythaAdd({acc}){
@@ -615,6 +618,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
 </body>
 </html>
+
 
 
 
