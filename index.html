@@ -345,6 +345,7 @@ function GameAdd({acc}){
     </div>
   );
 }
+
 /* ----------------------- SOUSTRACTIONS --------------------- */
 function GameSub({acc}){
   const {rootBg,rootText,cardStyle}=acc;
@@ -363,92 +364,140 @@ function GameSub({acc}){
 
   const init=()=>{
     let list=[];
-    if(mode==="niveau1"){ for(let i=0;i<questionCount;i++){ const a=rand(1,4),b=rand(0,a); list.push({a,b,r:a-b}); } }
-    else if(mode==="niveau2"){ for(let i=0;i<questionCount;i++){ const a=rand(1,9),b=rand(0,a); list.push({a,b,r:a-b}); } }
-    else if(mode==="niveau3"){ for(let i=0;i<questionCount;i++){ const a=rand(2,9)*10,b=rand(1,(a/10)-1)*10; list.push({a,b,r:a-b}); } }
-    else if(mode==="trou"){ const L=["a-_=r","_=b=r-","r=_-b"]; for(let i=0;i<questionCount;i++){ const a=rand(1,10),b=rand(0,a),r=a-b; list.push({a,b,r,layout:L[rand(0,2)]}); } }
-    else { for(let i=0;i<questionCount;i++){ const a=rand(1,10),b=rand(0,a); if(Math.random()<0.5) list.push({kind:"simple",a,b,r:a-b}); else {const L=["a-_=r","_=b=r-","r=_-b"][rand(0,2)]; list.push({kind:"trou",a,b,r:a-b,layout:L});}}}
+    const make=(min,max)=>rand(min,max);
+
+    if(mode==="niveau1"){ 
+      for(let i=0;i<questionCount;i++){ const a=make(1,4),b=make(0,a); list.push({a,b,r:a-b}); } 
+    }
+    else if(mode==="niveau2"){ 
+      for(let i=0;i<questionCount;i++){ const a=make(1,9),b=make(0,a); list.push({a,b,r:a-b}); } 
+    }
+    else if(mode==="niveau3"){ // < 50 sans retenue
+      for(let i=0;i<questionCount;i++){
+        const a=make(10,49),b=make(0,a);
+        if((a%10)-(b%10)<0) {i--; continue;}
+        list.push({a,b,r:a-b});
+      }
+    }
+    else if(mode==="niveau4"){ // < 100 sans retenue
+      for(let i=0;i<questionCount;i++){
+        const a=make(10,99),b=make(0,a);
+        if((a%10)-(b%10)<0) {i--; continue;}
+        list.push({a,b,r:a-b});
+      }
+    }
+    else if(mode==="trou"){ // à trou <100 sans retenue
+      const L=["a-_=r","_=b=r","r=_-b"];
+      for(let i=0;i<questionCount;i++){
+        const a=make(10,99),b=make(0,a),r=a-b;
+        if((a%10)-(b%10)<0) {i--; continue;}
+        list.push({a,b,r,layout:L[rand(0,2)]});
+      }
+    }
+    else { // défis <100 sans retenue, mix simple et trou
+      for(let i=0;i<questionCount;i++){
+        const pick=Math.random()<0.5?"simple":"trou";
+        const a=make(10,99),b=make(0,a),r=a-b;
+        if((a%10)-(b%10)<0) {i--; continue;}
+        if(pick==="simple") list.push({kind:"simple",a,b,r});
+        else {const L=["a-_=r","_=b=r","r=_-b"][rand(0,2)]; list.push({kind:"trou",a,b,r,layout:L});}
+      }
+    }
+
     setItems(list); setIdx(0); setAnswers([]); setTick(0); setOne(""); setStarted(true); setFinished(false);
   };
 
-  useEffect(()=>{ if(!started||finished) return; if(timeLimit!=null && tick>=timeLimit){ submit(true);} },[tick]);
+  useEffect(()=>{ if(!started||finished) return; if(timeLimit!=null && tick>=timeLimit){ vibrate(); submit(true);} },[tick]);
 
   const current=items[idx];
 
   const submit=(timeout=false)=>{
     if(!current) return;
     let right=false,user=null,qtxt="",goodTxt="";
-    if(["niveau1","niveau2","niveau3"].includes(mode)){
-      const guess=parseInt(one,10); right=!timeout && guess===current.r;
-      user=String(guess); qtxt=`${current.a} - ${current.b} = ?`; goodTxt=String(current.r);
+    const guess=parseInt(one,10);
+
+    if(["niveau1","niveau2","niveau3","niveau4"].includes(mode)){
+      right=!timeout && guess===current.r;
+      user=String(guess);
+      qtxt=`${current.a} - ${current.b} = ?`;
+      goodTxt=String(current.r);
     }
-    else if(mode==="trou"){ const guess=parseInt(one,10); let expected;
+    else if(mode==="trou" || mode==="defis"){
+      let expected;
       if(current.layout==="a-_=r"){expected=current.a-current.r;qtxt=`${current.a} - ? = ${current.r}`;}
-      else if(current.layout==="_=b=r-"){expected=current.r+current.b;qtxt=`? - ${current.b} = ${current.r}`;}
+      else if(current.layout==="_=b=r"){expected=current.r+current.b;qtxt=`? - ${current.b} = ${current.r}`;}
       else {expected=current.r+current.b;qtxt=`${current.r} = ? - ${current.b}`;}
-      right=!timeout && guess===expected; user=String(guess); goodTxt=String(expected);
+      right=!timeout && guess===expected;
+      user=String(guess); goodTxt=String(expected);
     }
-    else {const guess=parseInt(one,10); right=!timeout && guess===current.r; user=String(guess); qtxt=`${current.a}-${current.b}=?`; goodTxt=String(current.r);}
+
     setAnswers(p=>[...p,{q:qtxt,good:goodTxt,user,correct:right,timeout}]);
     if(idx+1>=items.length){setFinished(true);setStarted(false);} else {setIdx(i=>i+1);setTick(0);setOne("");}
   };
 
-  return (
-    <div className="min-h-screen p-6" style={{backgroundColor:rootBg,color:rootText}}>
-      <div className="max-w-5xl mx-auto space-y-6">
-        {!started && !finished && (
-          <div className="grid md:grid-cols-3 gap-4">
-            <AccessibilityCard acc={acc}/>
-            <div className="card rounded-2xl p-4" style={cardStyle}>
-              <div className="font-bold mb-2">Mode</div>
-              <div className="grid gap-1">
-                <label><input type="radio" checked={mode==="niveau1"} onChange={()=>setMode("niveau1")}/> Niveau 1 — nombres &lt; 5</label>
-                <label><input type="radio" checked={mode==="niveau2"} onChange={()=>setMode("niveau2")}/> Niveau 2 — ≤ 10</label>
-                <label><input type="radio" checked={mode==="niveau3"} onChange={()=>setMode("niveau3")}/> Les dizaines</label>
-                <label><input type="radio" checked={mode==="trou"} onChange={()=>setMode("trou")}/> À trou</label>
-                <label><input type="radio" checked={mode==="defis"} onChange={()=>setMode("defis")}/> Défis</label>
-              </div>
-              <div className="font-bold mt-3 mb-1">Nombre de questions</div>
-              {[5,10,15,20].map(n=><button key={n} onClick={()=>setQuestionCount(n)} className={"pill "+(questionCount===n?"active":"")}>{n}</button>)}
-              <div className="font-bold mt-3 mb-1">Temps</div>
-              {[3,5,10].map(s=><button key={s} onClick={()=>setTimeLimit(s)} className={"pill "+(timeLimit===s?"active":"")}>{s}s</button>)}
-              <button onClick={()=>setTimeLimit(null)} className={"pill "+(timeLimit==null?"active":"")}>Pas de chrono</button>
+  return (<div className="min-h-screen p-6" style={{backgroundColor:rootBg,color:rootText}}>
+    <div className="max-w-5xl mx-auto space-y-6">
+      {!started && !finished && (
+        <div className="grid md:grid-cols-3 gap-4">
+          <AccessibilityCard acc={acc}/>
+          <div className="card rounded-2xl p-4" style={cardStyle}>
+            <div className="font-bold mb-2">Mode</div>
+            <div className="grid gap-1">
+              <label><input type="radio" checked={mode==="niveau1"} onChange={()=>setMode("niveau1")}/> Niveau 1 — &lt; 5</label>
+              <label><input type="radio" checked={mode==="niveau2"} onChange={()=>setMode("niveau2")}/> Niveau 2 — ≤ 10</label>
+              <label><input type="radio" checked={mode==="niveau3"} onChange={()=>setMode("niveau3")}/> Niveau 3 — &lt; 50 sans retenue</label>
+              <label><input type="radio" checked={mode==="niveau4"} onChange={()=>setMode("niveau4")}/> Niveau 4 — &lt; 100 sans retenue</label>
+              <label><input type="radio" checked={mode==="trou"} onChange={()=>setMode("trou")}/> Soustractions à trou</label>
+              <label><input type="radio" checked={mode==="defis"} onChange={()=>setMode("defis")}/> Défis mélangés</label>
             </div>
-            <div className="card rounded-2xl p-4" style={cardStyle}>
-              <div className="font-bold mb-2">Action</div>
-              <button onClick={init} className="px-4 py-2 rounded-2xl text-white" style={{backgroundColor:BRAND}}>Commencer</button>
-            </div>
+            <div className="font-bold mt-3 mb-1">Nombre de questions</div>
+            <div className="flex gap-2 flex-wrap">{[5,10,15,20].map(n=><button key={n} onClick={()=>setQuestionCount(n)} className={"pill "+(questionCount===n?"active":"")}>{n}</button>)}</div>
+            <div className="font-bold mt-3 mb-1">Temps par question</div>
+            <div className="flex gap-2 flex-wrap">{[3,5,10].map(s=><button key={s} onClick={()=>setTimeLimit(s)} className={"pill "+(timeLimit===s?"active":"")}>{s}s</button>)}<button onClick={()=>setTimeLimit(null)} className={"pill "+(timeLimit==null?"active":"")}>Pas de chrono</button></div>
           </div>
-        )}
+          <div className="card rounded-2xl p-4" style={cardStyle}><div className="font-bold mb-2">Action</div><button onClick={init} className="px-4 py-2 rounded-2xl text-white" style={{backgroundColor:BRAND}}>Commencer</button></div>
+        </div>
+      )}
 
-        {started && current && (
-          <div className="space-y-4">
-            <div className="card rounded-2xl p-3" style={cardStyle}>
-              <div className="flex justify-between"><div><b>Question :</b> {idx+1}/{items.length}</div><div><b>⏱</b> {timeLimit==null?"∞":`${Math.max(0,timeLimit - tick)}s`}</div></div>
-              <Progress remaining={timeLimit==null?0:Math.max(0,timeLimit - tick)} total={timeLimit}/>
-            </div>
+      {started && current && (
+        <div className="space-y-4">
+          <div className="card rounded-2xl p-3" style={cardStyle}>
+            <div className="flex items-center justify-between"><div><strong>Question :</strong> {idx+1}/{items.length}</div><div><strong>⏱ Temps :</strong> {timeLimit==null?"∞":`${Math.max(0,(timeLimit - tick))}s`}</div></div>
+            <Progress remaining={timeLimit==null?0:Math.max(0,timeLimit - tick)} total={timeLimit}/>
+          </div>
 
-            <div className="card rounded-2xl p-6 text-center" style={cardStyle}>
-              <div className="flex justify-center gap-2 mb-4">
-                {Array.from({length:current.a}).map((_,i)=>
+          <div className="card rounded-2xl p-6 text-center" style={cardStyle}>
+            {/* Représentation visuelle */}
+            <div className="flex justify-center gap-3 mb-4">
+              {current.a%10===0 ? (
+                Array.from({length:current.a/10}).map((_,i)=>
+                  <div key={i} className="relative inline-block">
+                    <img src="dizaine.png" alt="dizaine" className="h-20 w-auto"/>
+                    {i<current.b/10 && <div className="absolute inset-0"><div className="barred"></div></div>}
+                  </div>
+                )
+              ) : (
+                Array.from({length:current.a}).map((_,i)=>
                   <div key={i} className="relative h-6 w-6 rounded-full" style={{background:"#7ad1c9"}}>
                     {i<current.b && <div className="absolute inset-0"><div className="barred"></div></div>}
-                  </div>)}
-              </div>
-              <div className="text-4xl font-black mb-4">{current.a} - {current.b} = ?</div>
-              <form onSubmit={e=>{e.preventDefault();submit(false);}} className="flex gap-3 justify-center items-center">
-                <input value={one} onChange={e=>setOne(e.target.value.replace(/\D/g,""))} inputMode="numeric"
-                  className="w-28 text-center text-3xl px-4 py-3 rounded-2xl border violet-border fill-hint diag-txt"/>
-                <button className="px-5 py-3 rounded-2xl text-white font-semibold" style={{backgroundColor:BRAND}}>Valider</button>
-              </form>
+                  </div>
+                )
+              )}
             </div>
-          </div>
-        )}
 
-        {finished && <Recap answers={answers} cardStyle={cardStyle} onReplay={init}/>}
-      </div>
+            <div className="text-4xl font-black mb-4">{current.a} - {current.b} = ?</div>
+            <form onSubmit={e=>{e.preventDefault();submit(false);}} className="flex gap-3 justify-center items-center">
+              <input value={one} onChange={e=>setOne(e.target.value.replace(/\D/g,""))} inputMode="numeric" className="w-28 text-center text-3xl px-4 py-3 rounded-2xl border violet-border fill-hint diag-txt"/>
+              <button className="px-5 py-3 rounded-2xl text-white font-semibold shadow" style={{backgroundColor:BRAND}} type="submit">Valider</button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {finished && <Recap answers={answers} cardStyle={cardStyle} onReplay={()=>{setStarted(false);setFinished(false);setAnswers([]);setIdx(0);setItems([]);setTick(0);}}/>}
+      <div className="mt-6"><a href="#/" className="px-4 py-2 rounded-2xl border">Retour au menu</a></div>
     </div>
-  );
+  </div>);
 }
 
 /* ---------- Table de Pythagore ---------- */
@@ -566,6 +615,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
 </body>
 </html>
+
 
 
 
