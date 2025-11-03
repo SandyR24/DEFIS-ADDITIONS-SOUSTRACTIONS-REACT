@@ -239,7 +239,8 @@ function GameAdd({acc}){
               <button onClick={init} className="px-4 py-2 rounded-2xl text-white" style={{backgroundColor:BRAND}}>Commencer</button>
             </div>
           </div>
-        )}
+        )
+        }
 
         {started && current && (
           <div className="space-y-4">
@@ -263,7 +264,8 @@ function GameAdd({acc}){
                   <button className="px-5 py-3 rounded-2xl text-white font-semibold" style={{backgroundColor:BRAND}}>Valider</button>
                 </form>
               </div>
-            )}
+            )
+            }
 
             {/* Additions normales */}
             {["niveau1","niveau2","niveau3","niveau4","niveau5","niveau6"].includes(mode) && (
@@ -598,7 +600,8 @@ function Hub({go}){return(<main className="max-w-5xl mx-auto px-4 py-8">
     <article className="card p-6"><h3 className="text-xl font-extrabold text-[color:var(--brand)]">Jeu — Soustractions</h3><a onClick={()=>go("/sub")} className="btn mt-4 inline-block cursor-pointer">Jouer</a></article>
     <article className="card p-6"><h3 className="text-xl font-extrabold text-[color:var(--brand)]">Jeu — Table de Pythagore (additions)</h3><a onClick={()=>go("/pytha")} className="btn mt-4 inline-block cursor-pointer">Découvrir</a></article>
   </div>
-</main>);}
+</main>);
+}
 
 function App(){
   const [route,setRoute]=useState(location.hash.replace(/^#/,"")||"/");
@@ -618,6 +621,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
 </body>
 </html>
+
 
 
 
