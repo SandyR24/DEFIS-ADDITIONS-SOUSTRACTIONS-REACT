@@ -202,9 +202,9 @@ function GameAdd({acc}){
               <div className="font-bold mb-2">Mode</div>
               <div className="grid gap-1">
                 <label><input type="radio" checked={mode==="niveau1"} onChange={()=>setMode("niveau1")}/> Niveau 1 — nombres &lt; 5</label>
-                <label><input type="radio" checked={mode==="niveau2"} onChange={()=>setMode("niveau2")}/> Niveau 2 — ≤ 10</label>
-                <label><input type="radio" checked={mode==="niveau3"} onChange={()=>setMode("niveau3")}/> Niveau 3 — &lt; 50</label>
-                <label><input type="radio" checked={mode==="niveau4"} onChange={()=>setMode("niveau4")}/> Dizaines</label>
+                <label><input type="radio" checked={mode==="niveau2"} onChange={()=>setMode("niveau2")}/> Niveau 2 — nombres ≤ 10</label>
+                <label><input type="radio" checked={mode==="niveau3"} onChange={()=>setMode("niveau3")}/> Niveau 3 — nombres &lt; 50</label>
+                <label><input type="radio" checked={mode==="niveau4"} onChange={()=>setMode("niveau4")}/> Dizaines "les chefs"</label>
                 <label><input type="radio" checked={mode==="niveau5"} onChange={()=>setMode("niveau5")}/> &lt; 100 sans retenue</label>
                 <label><input type="radio" checked={mode==="niveau6"} onChange={()=>setMode("niveau6")}/> &lt; 100 avec retenue</label>
                 <label><input type="radio" checked={mode==="decouverte"} onChange={()=>setMode("decouverte")}/> Découverte visuelle</label>
@@ -555,6 +555,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
 </body>
 </html>
+
 
 
 
