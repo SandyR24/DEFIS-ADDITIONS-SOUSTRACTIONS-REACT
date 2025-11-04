@@ -622,21 +622,29 @@ function Hub({go}){return(<main className="max-w-5xl mx-auto px-4 py-8">
 function App(){
   const [route,setRoute]=useState(location.hash.replace(/^#/,"")||"/");
   const acc=useAccessibility();
-  useEffect(()=>{const onHash=()=>setRoute(location.hash.replace(/^#/,"")||"/");window.addEventListener("hashchange",onHash);return()=>window.removeEventListener("hashchange",onHash);},[]);
+  useEffect(()=>{
+    const onHash=()=>setRoute(location.hash.replace(/^#/,"")||"/");
+    window.addEventListener("hashchange",onHash);
+    return ()=>window.removeEventListener("hashchange",onHash);
+  },[]);
   const go=k=>{location.hash="#"+k;};
-  return(<div className="min-h-screen p-6" style={{background:acc.rootBg,color:acc.rootText}}>
-    <TopNav route={route} go={go}/>
-    {route==="/" && <Hub go={go}/>}
-    {route==="/add" && <GameAdd acc={acc}/>}
-    {route==="/sub" && <GameSub acc={acc}/>}
-    {route==="/pytha" && <GamePythaAdd acc={acc}/>}
-  </div>);
-}
+  return (
+    <div className="min-h-screen p-6" style={{background:acc.rootBg,color:acc.rootText}}>
+      <TopNav route={route} go={go}/>
+      {route==="/" && <Hub go={go}/>}
+      {route==="/add" && <GameAdd acc={acc}/>}
+      {route==="/sub" && <GameSub acc={acc}/>}
+      {route==="/pytha" && <GamePythaAdd acc={acc}/>}
+    </div>
+  );
+} 
+
 
 ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
 </body>
 </html>
+
 
 
 
