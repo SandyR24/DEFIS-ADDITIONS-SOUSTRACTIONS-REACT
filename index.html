@@ -145,38 +145,39 @@ function GameAdd({acc}){
 
   useEffect(()=>{ if(!started||finished) return; const id=setInterval(()=>setTick(t=>t+1),1000); return ()=>clearInterval(id);},[started,finished]);
 
-  const init=()=>{
-    let list=[];
-    const make=(min,max)=>rand(min,max);
-    if(mode==="niveau1"){ for(let i=0;i<questionCount;i++){ const x=make(1,4),y=make(1,4); list.push({a:x,b:y,r:x+y}); } }
-    else if(mode==="niveau2"){ for(let i=0;i<questionCount;i++){ const x=make(1,9),y=make(1,9); list.push({a:x,b:y,r:x+y}); } }
-    else if(mode==="niveau3"){ for(let i=0;i<questionCount;i++){ let x=make(1,49),y=make(1,49-x%10); if((x%10)+(y%10)>=10) i--; else list.push({a:x,b:y,r:x+y}); } }
-    else if(mode==="niveau4"){ for(let i=0;i<questionCount;i++){ const x=make(1,9)*10,y=make(1,9)*10; list.push({a:x,b:y,r:x+y}); } }
-    else if(mode==="niveau5"){ for(let i=0;i<questionCount;i++){ let x=make(10,90),y=make(10,90); if((x%10)+(y%10)>=10) i--; else list.push({a:x,b:y,r:x+y}); } }
-    else if(mode==="niveau6"){ for(let i=0;i<questionCount;i++){ const x=make(10,90),y=make(10,90); list.push({a:x,b:y,r:x+y}); } }
-    else if(mode==="decouverte"){ for(let i=0;i<questionCount;i++){ let x=make(0,5),y=make(0,5); if(x+y===0){i--;continue;} list.push({a:x,b:y,r:x+y}); } }
-    else if(mode==="doubles"){ list=shuffle(Array.from({length:10},(_,i)=>({a:i+1,b:i+1,r:2*(i+1)}))).slice(0,questionCount); }
-    else if(mode==="moities"){ const evens=shuffle(Array.from({length:10},(_,i)=>(i+1)*2)); list=evens.slice(0,questionCount).map(t=>({total:t,half:t/2})); }
-    else if(mode==="trou"){ const layouts=["a+_=r","_=b=r","r=a+_"]; for(let i=0;i<questionCount;i++){ const x=make(0,10),y=make(0,10-x),r=x+y,L=layouts[rand(0,2)]; list.push({a:x,b:y,r,layout:L}); } }
-    else { for(let i=0;i<questionCount;i++){ const pick=rand(1,3);
-      if(pick===1){ const x=make(0,10),y=make(0,10-x); list.push({kind:"simple",a:x,b:y,r:x+y}); }
-      else if(pick===2){ const n=make(1,10); list.push({kind:"double",a:n,b:n,r:2*n}); }
-      else {
-  for (let i = 0; i < questionCount; i++) {
-    const pick = rand(1, 3);
-    if (pick === 1) {
-      const x = make(10, 90), y = make(10, 90);
-      list.push({ kind: "simple", a: x, b: y, r: x + y });
-    } else if (pick === 2) {
-      const n = make(5, 50);
-      list.push({ kind: "double", a: n, b: n, r: 2 * n });
-    } else {
-      const x = make(10, 90), y = make(10, 90), r = x + y;
-      const L = ["a+_=r", "_=b=r", "r=a+_"][rand(0, 2)];
-      list.push({ kind: "trou", a: x, b: y, r, layout: L });
+  const init = () => {
+  let list = [];
+  const make = (min, max) => rand(min, max);
+  if (mode === "niveau1") { ... }
+  else if (mode === "niveau2") { ... }
+  else if (mode === "niveau3") { ... }
+  else if (mode === "niveau4") { ... }
+  else if (mode === "niveau5") { ... }
+  else if (mode === "niveau6") { ... }
+  else if (mode === "decouverte") { ... }
+  else if (mode === "doubles") { ... }
+  else if (mode === "moities") { ... }
+  else if (mode === "trou") { ... }
+  else {
+    for (let i = 0; i < questionCount; i++) {
+      const pick = rand(1, 3);
+      if (pick === 1) {
+        const x = make(10, 90),
+          y = make(10, 90);
+        list.push({ kind: "simple", a: x, b: y, r: x + y });
+      } else if (pick === 2) {
+        const n = make(5, 50);
+        list.push({ kind: "double", a: n, b: n, r: 2 * n });
+      } else {
+        const x = make(10, 90),
+          y = make(10, 90),
+          r = x + y;
+        const L = ["a+_=r", "_=b=r", "r=a+_"][rand(0, 2)];
+        list.push({ kind: "trou", a: x, b: y, r, layout: L });
+      }
     }
   }
-}
+}; 
 
   useEffect(()=>{ if(!started||finished) return; if(timeLimit!=null && tick>=timeLimit){ submit(true);} },[tick]);
 
@@ -642,6 +643,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
 </body>
 </html>
+
 
 
 
